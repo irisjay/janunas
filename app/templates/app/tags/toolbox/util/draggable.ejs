@@ -1,0 +1,296 @@
+<div class="drag-box display-none">
+	<span class="text-icons drag-cue">&#xf400;</span>
+</div>
+<toolbox-util-placeholder>
+	<yield></yield>
+</toolbox-util-placeholder>
+
+<style>
+	<%-tag%> .drag-cue {
+		font-size: 35px;
+		margin: 0 auto;
+		text-align: center;
+		vertical-align: middle;
+		width: 1em;
+		line-height: 1em;
+		right: 1px;
+		top: 1px;
+		position: absolute;
+		color: #000;
+	    opacity: 0.3;
+	   	
+		/*transition: transform 0.05s;*/
+		z-index: 9999;
+	    
+    	will-change: opacity;
+	}
+	<%-tag%>.dragging .drag-cue {
+	    opacity: 1;
+	}
+	
+	<%-tag%> {
+/*	    position: relative;
+	    display: block;*/
+		z-index: 999;
+	}
+	<%-tag%>.dragging {
+		z-index: 9999;
+	}
+	
+	<%-tag%>.item {
+		padding: 0;
+	}
+	
+	<%-tag%> .drag-box {
+		/*position: relative;*/
+		display: block;
+		
+		background: rgba(255,255,255,0.1);
+		border: 1px #bbb solid;
+		border-radius: 5px;
+	    
+		/*transition: transform 0.05s;*/
+		
+		
+		-ms-transform: scale(0.99, 0.99); /* IE 9 */
+		-webkit-transform: scale(0.99, 0.99); /* Safari */
+		transform: scale(0.99, 0.99);
+		
+		/*-webkit-filter: drop-shadow(1px 1px 2px #bbb);
+		filter: drop-shadow(1px 1px 2px #bbb);*/
+	}
+	toolbox-util-expandable <%-tag%> .drag-box {
+	    background: none;
+	    border: 0;
+	}
+	<%-tag%>.dragging .drag-box {
+		-ms-transform: scale(0.9, 0.9); /* IE 9 */
+		-webkit-transform: scale(0.9, 0.9); /* Safari */
+		transform: scale(0.9, 0.9);
+	}
+	/*<%-tag%> .item {
+		display: inline;
+		padding: 0;
+	}*/
+</style>
+
+
+
+<script>
+	<%- require ('./get') (__filename) ('interact.js') %>
+</script>
+<script>
+	var drag =	function (draggable, emit_options) {
+	
+					//log (draggable);
+					
+					emit_options = emit_options || {};
+					emit_options =	{
+										start: emit_options ['start'] || 'drag-start',
+										move: emit_options ['move'] || 'dragging',
+										end: emit_options ['end'] || 'drag-end'
+									};
+	
+					var x = 0;
+					var y = 0;
+					
+					//var emitter = draggable;
+					var dragging = false;
+	
+					var drag_calculate =	function (dx, dy) {
+												x += dx;
+												y += dy;
+											};
+					var drag_move =	adthrottle (function () {
+										draggable .style .webkitTransform =
+										draggable .style .transform =
+											'translate(' + x + 'px, ' + y + 'px)';
+									}, 50);
+					var drag_emit =	function (/* args */) {
+										//log (emitter, arguments);
+										send_event (draggable) .apply (this, arguments);
+									};
+					var track_coordinates =	function (action/* args */) {
+												var coordinates = { x: x, y: y };
+												action .apply (this, [coordinates] .concat ([] .slice .call (arguments, 1)));
+												if (coordinates .x !== x || coordinates .y !== y) {
+													x = coordinates .x;
+													y = coordinates .y;
+													drag_move ();
+												}
+											};
+	
+					interact (draggable)
+						.draggable (
+							{
+								inertia: true,
+								restrict: {
+									restriction: closest_parent (draggable, '.content') || closest_parent (draggable, '.page') || closest_parent (draggable, 'body'),
+									endOnly: true,
+									elementRect: { top: 0, left: 0, bottom: 1, right: 1 }
+								},
+								autoScroll: true,
+						
+								onstart:	function (event) {
+												track_coordinates (
+													drag_emit .bind ({}, emit_options .start)
+												);
+												draggable .classList .add ('dragging');
+											},
+								onmove:	function (event) {
+											if (! dragging) {
+												track_coordinates (
+													drag_emit .bind ({}, emit_options .move),
+													event .dx, event .dy
+												);
+												dragging = true;
+											}
+									
+											drag_calculate (event .dx, event .dy);
+											drag_move ();
+											
+											track_coordinates (
+												drag_emit .bind ({}, emit_options .move),
+												event .dx, event .dy
+											);
+										},
+								onend:	function (event) {
+											draggable .classList .remove ('dragging');
+											track_coordinates (
+												drag_emit .bind ({}, emit_options .end)
+											);
+											dragging = false;
+										},
+								manualStart: true
+							}
+						) .on ('down', function (event) {
+						    var interaction  = event .interaction;
+						
+						    if (event .srcElement .classList .contains ('drag-cue')) {
+								interaction .start (
+									{ name: 'drag' },
+									event .interactable,
+									event .currentTarget
+								);
+						    }
+						});
+						
+					
+						
+				};
+	
+					var lift =	function (liftable) {
+									var body = closest_parent (liftable, '.scroll') || closest_parent (liftable, '.page') || closest_parent (liftable, 'body');
+									//draggable .style .setProperty ('transform', 'none', 'important');
+									var lift_position = liftable .getBoundingClientRect ();
+									var relative_position = body .getBoundingClientRect ();
+									
+									var placeholder = liftable .cloneNode (false);
+									placeholder .style .setProperty ('display', 'none');
+									prepend (body, placeholder);
+									swap_nodes (placeholder, liftable);
+									
+									liftable .style .setProperty ('position', 'absolute', 'important');
+									liftable .style .setProperty ('top', (lift_position .top - relative_position .top) + 'px', 'important');
+									liftable .style .setProperty ('left', (lift_position .left - relative_position .left) + 'px', 'important');
+									liftable .style .setProperty ('width', lift_position .width + 'px', 'important');
+									liftable .style .setProperty ('height', lift_position .height + 'px', 'important');
+									liftable .style .setProperty ('overflow', 'visible', 'important');
+					//log ('start', lift_position);
+									return placeholder;
+								};
+					var unlift =	function (liftable, placeholder) {
+										if (placeholder) {
+											liftable .style .removeProperty ('position');
+											liftable .style .removeProperty ('top');
+											liftable .style .removeProperty ('left');
+											liftable .style .removeProperty ('width');
+											liftable .style .removeProperty ('height');
+											liftable .style .removeProperty ('overflow');
+											
+											swap_nodes (placeholder, liftable);
+											placeholder .parentNode .removeChild (placeholder);
+										}
+									};
+					var reset =	function (outward_face, inward_face) {
+									inward_face .style .removeProperty ('width');
+									inward_face .style .removeProperty ('height');
+									inward_face .classList .add ('display-none');
+									
+									outward_face .style .removeProperty ('position');
+									outward_face .style .removeProperty ('display');
+								};
+					var lift_push =	function (lift) {
+										return	function (element) {
+													if (element .getAttribute ('lift') != undefined) {
+														element .removeAttribute ('lift');//log('lifting', element);
+														return lift (element);
+													}
+												};
+									};
+</script>
+<script>
+	var self = this;
+	
+	var loaded_signal = 'loaded';
+	
+	var lift_placeholder;
+	var lifted = !! opts .lift;
+	
+	self .understands (loaded_signal);
+	
+	self .understands ('drag-start');
+	self .understands ('dragging');
+	self .understands ('drag-end');
+	
+	if (opts .start) self .stuff .on ('drag-start', function (coordinates) {
+		self .stuff .trigger (opts .start, coordinates);
+	});
+	if (opts .move) self .stuff .on ('dragging', function (coordinates, dx, dy) {
+		self .stuff .trigger (opts .move, coordinates, dx, dy);
+	});
+	if (opts .end) self .stuff .on ('drag-end', function (coordinates) {
+		self .stuff .trigger (opts .end, coordinates);
+	});
+	
+	self .on ('mount', function () {//log ('mount');debugger;
+		drag (self .root);	
+		self .stuff .trigger (loaded_signal);
+	});
+	self .on ('unmount', function () {
+		unlift (self .root, lift_placeholder);
+	});
+	self .on ('update', function () {//log ('update');
+	//debugger;
+		self .stuff .trigger (loaded_signal);
+	});
+	
+	self .stuff .on (loaded_signal, function () {
+		var outward_face = self .root;
+		var inward_face = self .root .firstElementChild;
+			
+		unlift (self .root, lift_placeholder);
+		reset (outward_face, inward_face);
+		on_next_tick (function () {
+			
+			var content = self .tags ['toolbox-util-placeholder'] .root;
+			
+			var content_size = content .getBoundingClientRect ();
+	
+	//log(outward_face, inward_face, content, content_size);
+	
+			inward_face .style .setProperty ('width', content_size .width + 'px', 'important');
+			inward_face .style .setProperty ('height', content_size .height + 'px', 'important');
+			inward_face .classList .remove ('display-none');
+			
+			outward_face .style .setProperty ('position', 'relative', 'important');
+			outward_face .style .setProperty ('display', 'block', 'important');
+			
+			append (inward_face, content);	
+			
+			on_next_tick (function () {		
+				lift_placeholder = lift_push (lift) (self .root);
+			});
+		});
+	});
+</script>

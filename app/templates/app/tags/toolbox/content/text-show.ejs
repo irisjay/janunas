@@ -1,0 +1,67 @@
+<input class="dropdown-input" value={ recalls ('text') } disabled>
+<button class="dropdown-btn text-icons" type="button">&#xf123;</button>
+
+<style>
+	<%- require ('./get') (__filename) ('awesomplete.css') %>
+</style>
+<script>
+	<%- require ('./get') (__filename) ('awesomplete.js') %>
+</script>
+<script>
+	(function (self) {
+		
+		self .on ('mount', function () {
+			on_next_tick (function () {
+				var text_input = self .root .firstElementChild;
+				var input_button = text_input .nextElementSibling;
+				
+				var autocomplete =	new Awesomplete (text_input, self .recalls (opts .autocomplete));
+				input_button .addEventListener ('click', function () {
+					if (autocomplete .ul .childNodes .length === 0) {
+						autocomplete .evaluate ();
+					}
+					else if (autocomplete .ul . hasAttribute ('hidden')) {
+						autocomplete .open ();
+					}
+					else {
+						autocomplete .close ();
+					}
+				});
+			});
+		});
+	}) (this);
+</script>
+<style>
+	<%-tag%> .dropdown-input {
+	    border-top-right-radius: 0;
+	    border-bottom-right-radius: 0;
+	    width: 12em;
+	    height: 2em;
+	    padding: .1em .3em;
+	    border: 0;
+	    border: 1px solid hsl(80%, 80%, 80%);
+	    background: hsla(0,0%,60%,.2);
+	    border-radius: .3em;
+	    box-shadow: .05em .1em .3em rgba(0,0,0,.3) inset;
+	}
+	<%-tag%> input, button {
+	    font: inherit;
+	    text-shadow: inherit;
+	}
+	
+	
+	<%-tag%> .dropdown-btn {
+	    vertical-align: top;
+	    height: 2em;
+	    border-top-left-radius: 0;
+	    border-bottom-left-radius: 0;
+	}
+	<%-tag%> button {
+	    padding: .1em .5em;
+	    border-radius: .3em;
+	    background: hsl(80, 80%, 80%);
+	    background: hsla(0, 0%, 100%,.2);
+	    border: 1px solid rgba(0,0,0,.3);
+	    box-shadow: 0 1px white inset, 0 .3em .3em -.3em rgba(0,0,0,.3);
+	}
+</style>

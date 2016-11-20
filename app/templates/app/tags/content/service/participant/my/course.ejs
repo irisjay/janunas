@@ -1,0 +1,27 @@
+<model-themer>
+    
+    <h2>{ ((recalls ('course') || {}) .course || {}) .name }</h2>
+    
+    <table>
+        <tr><th>Modules</th></tr>
+		<tr each={ assemble (((recalls ('course') || {}) .course || {}) .module_set) }
+		    ><td
+		        ><a href="#service/participant/my/module/#{ recalls ('course_id') }/{ order }" if={ done }><strike>{ name }</strike></a
+		        ><a href="#service/participant/my/module/#{ recalls ('course_id') }/{ order }" if={ ! done }>{ name }</a
+		    ></td
+		></tr>
+    </table>
+    
+</model-themer>
+
+<script>
+(function (self) {
+    self .stuff .on ('course', function () {
+        self .update ();
+    });
+    self .stuff .on ('course_id', function () {
+        self .update ();
+    });
+    
+})(this);
+</script>

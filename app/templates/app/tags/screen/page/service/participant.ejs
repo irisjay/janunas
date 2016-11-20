@@ -1,0 +1,22 @@
+<content-service-participant />
+
+<script>
+(function (self) {
+    var leak1 = undefined;
+    var leak2 = undefined;
+    
+    content .courses (self);
+    content .my_courses (self);
+    leak1 = setInterval (self .recalls .bind (self, 'all-courses'), 300);
+    leak2 = setInterval (self .recalls .bind (self, 'my-courses'), 300);
+	
+	display_errors ('all-courses', self);
+	display_errors ('my-courses', self);
+	
+    self .on ('unmount', function () {
+        leak1 && clearInterval (leak1);
+        leak2 && clearInterval (leak2);
+    });
+})(this);
+</script>
+

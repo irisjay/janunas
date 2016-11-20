@@ -1,0 +1,17 @@
+<content-service-instructor-module-add />
+
+<script>
+(function (self) {
+    self .understands ('input');
+    self .stuff .on ('input', function (course_id) {
+        remembers ({
+            course_id: course_id
+        }) (self);
+        
+        util .module_new (course_id) (self);
+        
+	    display_errors ('new', self);
+    });
+})(this);
+</script>
+

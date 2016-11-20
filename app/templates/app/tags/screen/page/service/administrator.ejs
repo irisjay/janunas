@@ -1,0 +1,17 @@
+<content-service-administrator />
+
+<script>
+(function (self) {
+    var leak = undefined;
+    
+    content .users (self);
+    leak = setInterval (self .recalls .bind (self, 'all-users'), 300);
+    
+    display_errors ('all-users', self);
+    
+    self .on ('unmount', function () {
+        leak && clearInterval (leak);
+    });
+})(this);
+</script>
+

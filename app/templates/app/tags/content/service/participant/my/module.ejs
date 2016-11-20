@@ -1,0 +1,31 @@
+<model-themer>
+    
+    <h2 if={ ((assemble (((recalls ('course') || {}) .course || {}) .module_set) || {}) [recalls ('module_order')] || {}) .done }><strike>{ ((assemble (((recalls ('course') || {}) .course || {}) .module_set) || {}) [recalls ('module_order')] || {}) .name }</strike></h2>
+    <h2 if={ ! ((assemble (((recalls ('course') || {}) .course || {}) .module_set) || {}) [recalls ('module_order')] || {}) .done }>{ ((assemble (((recalls ('course') || {}) .course || {}) .module_set) || {}) [recalls ('module_order')] || {}) .name }</h2>
+    
+    <table>
+        <tr><th>Components</th><th></th></tr>
+		<tr each={ assemble (((assemble (((recalls ('course') || {}) .course || {}) .module_set) || {}) [recalls ('module_order')] || {}) .component_set) }
+		    ><td
+		        ><a href="#service/participant/my/component/#{ recalls ('course_id') }/{ recalls ('module_order') }/{ order }" if={ done } ><strike>{ name }</strike></a
+		        ><a href="#service/participant/my/component/#{ recalls ('course_id') }/{ recalls ('module_order') }/{ order }" if={ ! done } >{ name }</a
+		    ></td
+		></tr>
+    </table>
+    
+</model-themer>
+
+<script>
+(function (self) {
+    self .stuff .on ('course', function () {
+        self .update ();
+    });
+    self .stuff .on ('course_id', function () {
+        self .update ();
+    });
+    self .stuff .on ('module_order', function () {
+        self .update ();
+    });
+    
+})(this);
+</script>

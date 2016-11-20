@@ -1,0 +1,19 @@
+<content-service-instructor />
+
+<script>
+(function (self) {
+    var leak = undefined;
+    
+    content .my_courses (self);
+    leak = setInterval (self .recalls .bind (self, 'my-courses'), 300);
+    util .course_delete (self);
+	
+	display_errors ('my-courses', self);
+    display_errors ('delete', self);
+	
+    self .on ('unmount', function () {
+        leak && clearInterval (leak);
+    });
+})(this);
+</script>
+

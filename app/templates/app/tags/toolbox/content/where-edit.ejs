@@ -1,0 +1,14 @@
+<toolbox-content-text-edit autocomplete=".autocomplete" />
+
+<script>
+(function (self) {
+	remembers ({
+		'text':	self .recalls ('where'),
+		'.autocomplete':	{
+								list: ['HK', 'NT', 'KW'],
+								minChars: 0
+							}
+	}) (self);
+	pipe_through ('where') ('text') (self);
+}) (this);
+</script>

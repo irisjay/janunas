@@ -1,0 +1,24 @@
+<content-service-participant-my-course />
+
+<script>
+(function (self) {
+    var leak = undefined;
+    
+    self .understands ('input');
+    self .stuff .on ('input', function (course_id) {
+        content .course (course_id) (self);
+        leak = setInterval (self .recalls .bind (self, 'course'), 300);
+        
+	    display_errors ('course', self);
+	    
+        remembers ({
+            course_id: course_id
+        }) (self);
+    });
+    
+    self .on ('unmount', function () {
+        leak && clearInterval (leak);
+    });
+})(this);
+</script>
+

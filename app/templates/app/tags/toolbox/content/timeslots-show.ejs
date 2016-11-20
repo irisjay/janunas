@@ -1,0 +1,155 @@
+
+<div class="time-table">
+    <div class="hour-column">
+        <span class="hour-column-item header">{ recalls ('header') (7) }</span>
+        <span class="hour-column-item { selected: available }" each={ available, timeslot in recalls ('timeslots') (7) } />
+    </div><!--
+    --><div class="hour-column">
+        <span class="hour-column-item header">{ recalls ('header') (6) }</span>
+        <span class="hour-column-item { selected: available }" each={ available, timeslot in recalls ('timeslots') (6) } />
+    </div><!--
+    --><div class="hour-column">
+        <span class="hour-column-item header">{ recalls ('header') (5) }</span>
+        <span class="hour-column-item { selected: available }" each={ available, timeslot in recalls ('timeslots') (5) } />
+    </div><!--
+    --><div class="hour-column">
+        <span class="hour-column-item header">{ recalls ('header') (4) }</span>
+        <span class="hour-column-item { selected: available }" each={ available, timeslot in recalls ('timeslots') (4) } />
+    </div><!--
+    --><div class="hour-column">
+        <span class="hour-column-item header">{ recalls ('header') (3) }</span>
+        <span class="hour-column-item { selected: available }" each={ available, timeslot in recalls ('timeslots') (3) } />
+    </div><!--
+    --><div class="hour-column">
+        <span class="hour-column-item header">{ recalls ('header') (2) }</span>
+        <span class="hour-column-item { selected: available }" each={ available, timeslot in recalls ('timeslots') (2) } />
+    </div><!--
+    --><div class="hour-column">
+        <span class="hour-column-item header">{ recalls ('header') (1) }</span>
+        <span class="hour-column-item { selected: available }" each={ available, timeslot in recalls ('timeslots') (1) } />
+    </div><!--
+    --><div class="hour-column time">
+        <span class="hour-column-item header">{ recalls ('header') (0) }</span>
+        <span class="hour-column-item time" each={ name, timeslot in recalls ('timeslots') (0) }>{ name }</span>
+    </div>
+</div>
+
+<script>
+(function (self) {
+	var custom_headers = {}
+	var selected_slots = {};
+	
+	var headers;
+	var timeslots;
+	
+	var regenerate_timeslots =	function () {
+									if (opts .headers)
+										custom_headers = self .recalls (opts .headers);
+									if (opts .selections)
+										selected_slots = self .recalls (opts .selections);
+									
+									headers = ['幾點', '一', '二', '三', '四', '五', '六', '日'];
+									timeslots =	[
+													['6AM', '7AM', '8AM', '9AM', '10AM', '11AM', '12PM', '1PM', '2PM', '3PM', '4PM', '5PM', '6PM', '7PM', '8PM', '9PM', '10PM', '11PM', '12AM'], 
+													[false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false], 
+													[false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false], 
+													[false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false], 
+													[false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false], 
+													[false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false], 
+													[false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false], 
+													[false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false]
+												];
+													
+									for (var each in custom_headers) {
+										headers [each] = custom_headers [each];
+									}				
+									for (var each in selected_slots) {
+										var day = (each - each % 100) / 100;
+										var hour = each % 100;
+										timeslots [day] [hour] = selected_slots [each];
+									}
+									
+									//log (headers, timeslots);
+								};
+	regenerate_timeslots ();
+	
+	
+	self .on ('update', regenerate_timeslots);
+	
+	self .remembers ('header');
+	self .remembers ('timeslots');
+	
+	self .stuff .trigger ('header', function (day) {
+		return headers [day];
+	});
+	self .stuff .trigger ('timeslots', function (day) {
+		return timeslots [day];
+	});
+	
+})(this)
+</script>
+
+<style>
+	<%-tag%> .time-table {
+		text-align: center;
+		z-index: 200;
+		width: 100%;
+		height: 100%;
+		margin: 0 !important;
+		padding: 15px !important;
+		max-width: none;
+		font-size: 14px;
+		white-space: nowrap;
+		direction: rtl;
+	}
+	<%-tag%> .hour-column {
+		padding-left: 0;
+		padding-right: 0;
+		padding-top: 0;
+		padding-bottom: 0;
+		width: 12.25%;
+		max-width: 12.25%;
+		height: 100%;
+		display: inline-table;
+		position: relative;
+	}
+	<%-tag%> .hour-column-item.header {
+		font-weight: bold;
+		border: none;
+		font-size: 1.3em;
+		margin-bottom: 10px;
+		margin-top: -5px;
+	}
+	<%-tag%> .time-table .hour-column:first-child .hour-column-item {
+		border-right: none;
+	}
+	<%-tag%> .hour-column-item {
+		width: 100%;
+		height: 5%;
+		display: block;
+		border-right: 1px solid #ddd;
+		border-bottom: 1px solid #ddd;
+		box-sizing: content-box;
+	}
+	<%-tag%> .hour-column-item:last-child {
+		border-bottom: none;
+	}
+	<%-tag%> .hour-column-item.selected {
+		background: rgba(66, 165, 245, 0.5);
+		border: none;
+		-webkit-filter: drop-shadow(5px 5px 5px rgba(66, 165, 245, 0.5));
+		filter: drop-shadow(5px 5px 5px rgba(66, 165, 245, 0.5));
+	}
+	<%-tag%> .time .hour-column-item.time {
+		border-radius: 3px;
+		border: 1px solid #aaa;
+		font-size: 1.3em;
+		transform: scale3d(0.9, 0.9, 1) translate3d(-2px, 0px, 0px);
+		box-sizing: content-box;
+		font-weight: lighter;
+	}
+	<%-tag%> .time .hour-column-item.time:not(.clicked) {
+		box-shadow: 2px 1px 1px #ddd;
+	}
+</style>
+

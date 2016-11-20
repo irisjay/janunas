@@ -1,0 +1,23 @@
+<model-themer>
+    
+    <h2>{ ((assemble (((assemble (((recalls ('course') || {}) .course || {}) .module_set) || {}) [recalls ('module_order')] || {}) .component_set) || {}) [recalls ('component_order')] || {}) .name }</h2>
+    <p>{ ((assemble (((assemble (((recalls ('course') || {}) .course || {}) .module_set) || {}) [recalls ('module_order')] || {}) .component_set) || {}) [recalls ('component_order')] || {}) .content }</p>
+    
+</model-themer>
+
+<script>
+(function (self) {
+    self .stuff .on ('course', function () {
+        self .update ();
+    });
+    self .stuff .on ('course_id', function () {
+        self .update ();
+    });
+    self .stuff .on ('module_order', function () {
+        self .update ();
+    });
+    self .stuff .on ('component_order', function () {
+        self .update ();
+    });
+})(this);
+</script>

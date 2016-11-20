@@ -1,0 +1,46 @@
+<model-themer>
+    
+    <h2 if={ ((assemble (((assemble (((recalls ('course') || {}) .course || {}) .module_set) || {}) [recalls ('module_order')] || {}) .component_set) || {}) [recalls ('component_order')] || {}) .done } ><strike>{ ((assemble (((assemble (((recalls ('course') || {}) .course || {}) .module_set) || {}) [recalls ('module_order')] || {}) .component_set) || {}) [recalls ('component_order')] || {}) .name }</strike></h2>
+    <h2 if={ ! ((assemble (((assemble (((recalls ('course') || {}) .course || {}) .module_set) || {}) [recalls ('module_order')] || {}) .component_set) || {}) [recalls ('component_order')] || {}) .done } >{ ((assemble (((assemble (((recalls ('course') || {}) .course || {}) .module_set) || {}) [recalls ('module_order')] || {}) .component_set) || {}) [recalls ('component_order')] || {}) .name }</h2>
+    <p>{ ((assemble (((assemble (((recalls ('course') || {}) .course || {}) .module_set) || {}) [recalls ('module_order')] || {}) .component_set) || {}) [recalls ('component_order')] || {}) .content }</p>
+    
+    <button disabled if={ ((assemble (((assemble (((recalls ('course') || {}) .course || {}) .module_set) || {}) [recalls ('module_order')] || {}) .component_set) || {}) [recalls ('component_order')] || {}) .done } >
+        Already done!
+    </button>
+    <button type="submit" name="done_component" if={ ! ((assemble (((assemble (((recalls ('course') || {}) .course || {}) .module_set) || {}) [recalls ('module_order')] || {}) .component_set) || {}) [recalls ('component_order')] || {}) .done } >
+        I am done!
+    </button>
+    
+</model-themer>
+
+<script>
+(function (self) {
+    self .on ('mount', function () {
+        var done_component = self .root .querySelector ('button[name="done_component"]');
+        
+        done_component && done_component .addEventListener ('click', function () {
+            self .stuff .trigger ('done');
+        }, false);
+    });
+    self .on ('updated', function () {
+        var done_component = self .root .querySelector ('button[name="done_component"]');
+        
+        done_component && done_component .addEventListener ('click', function () {
+            self .stuff .trigger ('done');
+        }, false);
+    });
+    
+    self .stuff .on ('course', function () {
+        self .update ();
+    });
+    self .stuff .on ('course_id', function () {
+        self .update ();
+    });
+    self .stuff .on ('module_order', function () {
+        self .update ();
+    });
+    self .stuff .on ('component_order', function () {
+        self .update ();
+    });
+})(this);
+</script>

@@ -1,0 +1,46 @@
+<style>
+<%- require ('./get') (__filename) ('tacit.min.css') %>
+<%- require ('./get') (__filename) ('style.css') %>
+</style>
+
+<script>
+(function (self) {
+
+	var screens_data = {};
+	screens .add =	function (tag, args) {
+						return add_screen_as .apply (self, [undefined] .concat ([] .slice .call (arguments)));
+					};
+	screens .add_as =	function (id) {
+							return	function (/*tag, args*/) {
+										return add_screen_as .apply (self, [id] .concat ([] .slice .call (arguments)));
+									};
+						};
+						var add_screen_as =	function (id, tag_name/*, args*/) {
+											var time = new Date ();
+												if (id && screens_data [id] && screens_data [id] .root .localName === tag_name)
+													var tag = screens_data [id];
+												else {
+													screens .remove (id);
+							
+													var tag_root = document .createElement (tag_name);
+													self .root .insertBefore (tag_root, null);
+													var tag = riot .mount (tag_root, tag_name) [0];
+												}
+												var args = [] .slice .call (arguments, 2);
+												tag .stuff .trigger .apply (null, ['input'] .concat (args));
+												
+												screens_data [id || tag ._riot_id] = tag;	
+											log ('update screen time ' + (new Date () - time) + 'ms', arguments);	
+												return tag;
+											};
+	screens .get =	function () {
+						return screens_data;
+					};
+	screens .remove =	function (id) {
+							if (id && screens_data [id]) {
+								screens_data [id] .unmount ();
+								delete screens_data [id];
+							}
+						};
+})(this);
+</script>

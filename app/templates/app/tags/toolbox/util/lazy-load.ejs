@@ -1,0 +1,38 @@
+
+<toolbox-util-if if_={ recalls ('$show-loading') }>
+	<yield from="loading"></yield>
+</toolbox-util-if>
+<toolbox-util-if if_={ ! recalls ('$show-loading') }>
+	<yield from="content"></yield>
+</toolbox-util-if>
+
+<script>
+	var self = this;
+	
+	self .remembers ('$show-loading');
+	
+	self .stuff .trigger ('$show-loading', true);
+	
+	var going_to_load = false;
+	
+	self .on ('after-update', function () {//debugger;
+		if (self .recalls ('$show-loading')) {
+			self .stuff .trigger ('$show-loading', false);
+			setTimeout (function () {
+				self .update ();
+			}, 50);
+		}
+		else {
+			self .stuff .trigger ('$show-loading', true);
+		}
+	});
+	
+	on_next_tick (function () {
+		self .stuff .trigger ('$show-loading', false);
+		setTimeout (function () {
+			self .update ();
+		}, 200);
+	});
+	
+</script>
+

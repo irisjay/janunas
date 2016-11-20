@@ -1,0 +1,17 @@
+<content-login />
+
+<script>
+(function (self) {
+	if (get_cache (backend_path + '/login')) {
+		window .location .hash = '#service'
+	}
+	
+	util .register (self);
+	util .login (self);
+	
+	display_errors ('register', self);
+	display_errors ('login', self);
+	
+})(this);
+</script>
+

@@ -1,0 +1,29 @@
+<model-themer>
+    <fieldset>
+        <label>Course name:<input name="course_name" type="text" placeholder="Wow. Such course."></label>
+    </fieldset>
+    
+    <button type="submit" name="add_course">
+        Add course!
+    </button>
+</model-themer>
+
+<script>
+(function (self) {
+    self .on ('mount', function () {
+        var course_name = self .root .querySelector ('input[name="course_name"]');
+        var add_course = self .root .querySelector ('button[name="add_course"]');
+        
+        add_course .addEventListener ('click', function () {
+            self .stuff .one ('new', function (response) {
+                if (! response .error) {
+                    window .location .hash = '#service/instructor/'
+                }
+            })
+            self .stuff .trigger ('new', {
+                course_name: course_name .value
+            });
+        });
+    });
+})(this);
+</script>

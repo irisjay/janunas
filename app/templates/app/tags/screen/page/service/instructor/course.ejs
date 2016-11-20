@@ -1,0 +1,29 @@
+<content-service-instructor-course />
+
+<script>
+(function (self) {
+    var leak = undefined;
+    
+    self .understands ('input');
+    self .stuff .on ('input', function (course_id) {
+        content .course (course_id) (self);
+        leak = setInterval (self .recalls .bind (self, 'course'), 300);
+        util .module_delete (course_id) (self);
+        util .module_reorder (course_id) (self);
+        util .course_publish (self);
+        
+	    display_errors ('course', self);
+	    display_errors ('delete', self);
+	    display_errors ('reorder', self);
+	    
+        remembers ({
+            course_id: course_id
+        }) (self);
+    });
+    
+    self .on ('unmount', function () {
+        leak && clearInterval (leak);
+    });
+})(this);
+</script>
+

@@ -1,0 +1,20 @@
+<fieldset>
+    <label>Username:<input name="username" type="text" placeholder="admin"></label>
+    <label>Password:<input name="password" type="password"></label>
+</fieldset>
+
+<script>
+(function (self) {
+    self .on ('mount', function () {
+        var username = self .root .querySelector ('input[name="username"]');
+        var password = self .root .querySelector ('input[name="password"]');
+        
+        username .addEventListener ('input', function () {
+            self .stuff .trigger ('username', username .value);
+        });
+        password .addEventListener ('input', function () {
+            self .stuff .trigger ('password', password .value);
+        });
+    });
+})(this);
+</script>

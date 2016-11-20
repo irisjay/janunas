@@ -1,0 +1,336 @@
+
+	<toolbox-util-placeholder style="height: { top_placeholder_height }px; display: block;"></toolbox-util-placeholder>
+	<div each={ item, nth in loaded_items } item={ item } onload={ item != null && on_next_tick (stuff .trigger .bind (stuff, declare_item_signal, item) ) } no-reorder>
+		{ recalls (read_item_signal) (tags) (item) } 
+		<yield from="item"></yield>
+	</div>
+	<toolbox-util-placeholder style="height: { bottom_placeholder_height }px; display: block;"></toolbox-util-placeholder>
+	<div 
+		 if={ recalls (continue_signal) }
+	>
+		<yield from="loading"></yield>
+	</div>
+	
+	<script>
+		var self = this;
+		
+		var items_to_load = + self .opts .items_to_load;
+		var interval_for_loading = + self .opts .interval_for_loading;
+		
+		var request_signal = self .opts .request_signal;
+		var response_signal = self .opts .response_signal;
+		var continue_signal = self .continue_signal = self .opts .continue_signal;
+		
+		var how_to_read_signal = self .opts .how_to_read_signal;
+		
+		var declare_item_signal = self .declare_item_signal = self .opts .declare_item_signal || 'loaded-item';
+		var read_item_signal = self .read_item_signal = self .opts .read_item_signal || 'read-item';
+		
+		self .top_placeholder_height = 0;
+		self .bottom_placeholder_height = 0;
+		self .loaded_items = [];
+		
+		var list = self .root .parentNode;
+		var dynamic_load = self .root;
+		var top_placeholder;
+		
+		var the_imported_items = [];
+		var imported_items =	function () {
+									return	{
+												from: 0,
+												to: the_imported_items .length - 1
+											};
+								};
+		var item =	function (item_index) {
+						return the_imported_items [item_index] .item;
+					};
+		var height =	function (item_index) {
+							return the_imported_items [item_index] && the_imported_items [item_index] .height;
+						};
+		self .remembers ('item');
+		self .stuff .trigger ('item', item);
+										
+		//debugger;
+		var load =	prebounce (function () {
+				        var time = new Date ();
+							self .top_placeholder_height = top_placeholder_height ();
+							self .bottom_placeholder_height = bottom_placeholder_height ();
+							self .loaded_items = loaded_items (loaded_range);
+				        //log ('update expressions '+(new Date () - time)+ 'ms');
+				        //time = new Date ();
+							self .update ();
+				        log ('update dynamic '+(new Date () - time)+ 'ms');
+					}, 200, interval_for_loading);
+						var loaded_items =	function (loaded_range) {
+												return	range (loaded_range);
+											};
+						var top_placeholder_height =	function () {
+															var the_height = 0;
+															for (var item = 0; item < loaded_range .from; item ++) {
+																if (height (item) == null) 
+																	break;
+																the_height += height (item);
+															}
+															return the_height;
+														};
+						var bottom_placeholder_height =	function () {
+															var the_height = 0;
+															for (var item = loaded_range .to + 1; item < the_imported_items .length; item ++) {
+																if (height (item) == null) 
+																	break;
+																the_height += height (item);
+															}
+															return the_height;
+														};
+		
+		
+						var loaded_range =	{
+												from: 0,
+												to: -1
+											};
+										
+		var import_items =	function (new_items) {//log ('receieved items');
+								//move new items into importing items
+								for (var item_index in new_items) {
+									importing_items [item_index] = new_items [item_index];
+								}
+								
+								//import the importing items that are continuous with the imported items
+								for (
+									var next_imported_item = the_imported_items .length;
+									/*logged_with ('got item '+next_imported_item+'?')*/ (importing_items [next_imported_item]);
+									next_imported_item ++
+								) {
+									the_imported_items .push (
+										{
+											item: importing_items [next_imported_item]
+										} );
+									delete importing_items [next_imported_item];
+								}
+								
+								//check for replacements
+								for (var item_index in importing_items) {
+									if (item_index < the_imported_items .length) 
+									the_imported_items [item_index] .item = importing_items [item_index];
+									delete importing_items [next_imported_item];
+								}
+								//log ('the_imported_items', the_imported_items, 'importing_items', importing_items);
+								realign_items ();
+							};
+								var importing_items = {};
+		
+		self .understands (declare_item_signal);
+		self .stuff .on (declare_item_signal, function (item) {
+			if (! document .body .contains (self .root))
+				return;
+			
+			var loaded_item = one_child (self .root, '[item="'+item+'"]');
+			var height = loaded_item .offsetHeight;
+			var last_height = the_imported_items [item] .height;
+			if (last_height == null) {
+				the_imported_items [item] .height = height;
+			}
+			else if (last_height !== height) {
+				the_imported_items [item] .height = height;
+				
+				var height_difference = height - last_height;
+				self .top_placeholder_height = if_positive (self .top_placeholder_height + height_difference);
+				top_placeholder .style .height = self .top_placeholder_height + 'px';
+				list .scrollHeight = logged_with ('changing scroll by') (if_positive (list .scrollHeight + height_difference));
+			}
+			//log (item, height, last_height);
+		});
+		
+		self .stuff
+			.on (response_signal, import_items);
+		
+/*	self .on ('update', function () {
+			realign_items ();
+		});
+*/
+		self .on ('mount', function () {//log ('MOUNTEED');
+			top_placeholder = self .tags ['toolbox-util-placeholder'] [0];
+			realign_items ();
+			list .addEventListener ('scroll', realign_items);
+		});
+			var realign_items =	function () {
+									//log ('scroll', event);
+									var now_displayed_range = displayed_range ();
+									if (unaligned (now_displayed_range)) {
+										
+										if (self .recalls (continue_signal))
+											demand_items (unimported_items (now_displayed_range));
+										
+										loaded_range = loaded_part (now_displayed_range);
+						                on_next_tick (load);
+									}
+								};
+									var unaligned =	function (displayed_range) {
+													    return ! included_in (loaded_range, displayed_range);
+													};
+									var unimported_items =	function (displayed_range) {
+																/*if (displayed_range .to > imported_items () .to) {
+																	return	{
+																				from: imported_items () .to + 1,
+																				to: displayed_range .to
+																			};
+																}*/
+																if (displayed_range .to + items_to_load > imported_items () .to) {
+																	return	{
+																				from: imported_items () .to + 1,
+																				to: displayed_range .to + items_to_load
+																			};
+																}
+															};
+									var loaded_part =	function (displayed_range) {
+																return range_intersection (displayed_range, imported_items ());
+															};
+									var demand_items =	function (items_range) {
+															if (items_range)
+																self .stuff .trigger (request_signal, items_range);
+														};
+									var displayed_range =	function () {
+																return most_symmetrical_range (displayed_ranges ());
+															};
+																var displayed_ranges =	function () {
+																							var the_displayed_height_range = displayed_height_range ();
+																							return	{
+																										heights: the_displayed_height_range,
+																										items: displayed_item_range (the_displayed_height_range)
+																									};
+																						};
+																							var displayed_item_range =	function (the_displayed_height_range) {
+																															var displayed_item = 0;
+																															var displayed_height = 0;
+																															
+																															for (
+																																	;
+																																displayed_item < count (imported_items ())
+																																&& height (displayed_item) != null
+																																&& displayed_height + height (displayed_item) < the_displayed_height_range .from
+																																	;
+																																displayed_item ++
+																															) {
+																																displayed_height += height (displayed_item);
+																															}
+																															var top_item = displayed_item;
+																															//var top_height = displayed_height;
+																															
+																															for (
+																																	;
+																																displayed_item < count (imported_items ())
+																																&& height (displayed_item) != null
+																																&& displayed_height < the_displayed_height_range .to
+																																	;
+																																displayed_item ++
+																															) {
+																																displayed_height += height (displayed_item);
+																															}
+																															var bottom_item = displayed_item;
+																															
+																															//log (top_item, bottom_item);
+																															
+																															//var bottom_height = displayed_height;
+																															var positive_range =	{
+																																						from: if_positive (bottom_item - (items_to_load - 1)),
+																																						to: top_item - 1
+																																					};
+																															var negative_range =	{
+																																						from: top_item - 1,
+																																						to: if_positive (bottom_item - (items_to_load - 1))
+																																					};
+																															if (count (negative_range) > count (positive_range))
+																																return negative_range;
+																															else
+																																return positive_range;
+																														};
+																							var displayed_height_range =	function () {
+																																return	{
+																																			from: if_positive (list .scrollTop - dynamic_load .offsetTop),
+																																			to: if_positive (list .scrollTop - dynamic_load .offsetTop + list .clientHeight)
+																																		};
+																															};
+																var most_symmetrical_range =	function (displayed_ranges) {
+																									var displayed_item_range = displayed_ranges .items;
+																									var displayed_height_range = displayed_ranges .heights;
+																	
+																									var least_asymmetry = Number .MAX_VALUE;
+																									
+																									
+																									var displayed_height_top = 0;
+																									for (
+																										var displayed_item = 0;
+																										displayed_item < displayed_item_range .from;
+																										displayed_item ++
+																									) {
+																										displayed_height_top += height (displayed_item);
+																									}
+																									
+																									var displayed_height_bottom = displayed_height_top;
+																									for (
+																										var item_to_load = 0;
+																										item_to_load < items_to_load;
+																										item_to_load ++
+																									) {
+																										displayed_height_bottom += height (displayed_item_range .from + item_to_load);
+																									}
+																									
+																									
+																									var displayed_item;
+																									for (
+																										displayed_item = displayed_item_range .from;
+																										displayed_item <= displayed_item_range .to;
+																										displayed_item ++
+																									) {
+																										var top_difference = displayed_height_range .from - displayed_height_top;
+																										var bottom_difference = displayed_height_bottom - displayed_height_range .to;
+																										var asymmetry = Math .abs (top_difference - bottom_difference);
+																										if (asymmetry > least_asymmetry) {
+																											return	{
+																														from: (displayed_item - 1),
+																														to: (displayed_item  - 1) + (items_to_load - 1)
+																													};
+																										}
+																										else {
+																											least_asymmetry = asymmetry;
+																											displayed_height_top += height (displayed_item);
+																											displayed_height_bottom += height (displayed_item + items_to_load);
+																										}
+																									}
+																									
+																									return	{
+																												from: (displayed_item - 1),
+																												to: (displayed_item  - 1) + (items_to_load - 1)
+																											};
+																								};
+																								
+		
+		self .remembers (read_item_signal);
+		self .stuff .trigger (read_item_signal, function (item_tags) {//debugger;
+			return	function (item_number) {//debugger;
+						var item;
+						for (var item_tag of flatten (values (item_tags))) {
+							item = item || self .recalls ('item') (item_number);
+							if (! item_tag .recalls) {
+								item_tag .on ('before-mount', function () {
+									self .recalls (how_to_read_signal) (item_tag, item);
+								});
+							}
+							else {
+								self .recalls (how_to_read_signal) (item_tag, item);
+							}
+						}
+					};
+		});
+		var flatten =	function (arr) {
+							return	arr .reduce (function (flat, toFlatten) {
+										return flat .concat (Array .isArray (toFlatten) ? flatten (toFlatten) : toFlatten);
+									}, []);
+						}
+		var values =	function (obj) {
+							return	Object .keys (obj) .map (function (key) {
+										return obj [key];
+									});
+						};
+	</script>
+	
