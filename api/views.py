@@ -392,11 +392,11 @@ def user_edit(request, his_user_id):
             him.as_administrator = his_administrator
             him.save()
         if 'HTTP_X_RESTRICT_REMOVE' in request.META:
-            him.enroll_restricted = False
-            him.save()
+            him.as_participant.enroll_restricted = False
+            him.as_participant.save()
         if 'HTTP_X_RESTRICT_ADD' in request.META:
-            him.enroll_restricted = True
-            him.save()
+            him.as_participant.enroll_restricted = True
+            him.as_participant.save()
         
         data = {'edited':True}
         
