@@ -1,6 +1,7 @@
 <model-themer>
     
     <h2>{ ((recalls ('course') || {}) .course || {}) .name }<h3 if={ ((recalls ('course') || {}) .course || {}) .published }>(published)</h3></h2>
+    <p>{ ((recalls ('course') || {}) .course || {}) .description }</p>
     
     <table>
         <tr><th>Modules</th></tr>

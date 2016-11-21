@@ -848,7 +848,7 @@ util .component_done =	function (course_id, module_order, component_order) {
 util .course_new =	pipe_write ('new', backend_path + '/my/course/new', {
 						write:	{
 									method: 'GET',
-									headers: '{ with_ ("x-course-name", data .course_name) (logged_in_header ()) }'
+									headers: '{ with_ ("x-course-name", data .course_name) (with_ ("x-course-description", data .course_description) (logged_in_header ())) }'
 								}
 					}, '{ response }');
 util .course_delete =	pipe_write ('delete', backend_path + '/my/course/delete', {

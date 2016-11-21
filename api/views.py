@@ -70,9 +70,9 @@ def my_courses(request):
         user = User.objects.get(id=user_id)
         completed_courses = user.as_participant.completed_courses
         enrolled_courses = user.as_participant.enrolled_courses
-        courses_as_instructor = user.as_instructor and user.as_instructor.course_set.all()
+        courses_as_instructor = user.as_instructor and user.as_instructor.course_set.all() or []
         
-        data = {'as_participant':{'completed_courses':[{'name':course.name,'id':course.id} for course in completed_courses.all()], 'enrolled_courses':[{'name':course.name,'id':course.id} for course in enrolled_courses.all()]}, 'as_instructor':[{'name':course.name,'id':course.id} for course in courses_as_instructor or []]}
+        data = {'as_participant':{'completed_courses':[{'name':course.name,'id':course.id} for course in completed_courses.all()], 'enrolled_courses':[{'name':course.name,'id':course.id} for course in enrolled_courses.all()]}, 'as_instructor':[{'name':course.name,'id':course.id} for course in courses_as_instructor]}
         
         return JsonResponse(data)
     except Exception as error:
@@ -134,10 +134,11 @@ def my_course_new(request):
     try:
         user_id = request.META['HTTP_X_USER']
         course_name = request.META['HTTP_X_COURSE_NAME']
+        course_description = request.META['HTTP_X_COURSE_DESCRIPTION']
         
         user = User.objects.get(id=user_id)
         instructor = user.as_instructor
-        course = Course(name=course_name)
+        course = Course(name=course_name, description=course_description)
         course.save()
         course.instructor.add(instructor)
         course.save()
@@ -391,11 +392,11 @@ def user_edit(request, his_user_id):
             him.as_administrator = his_administrator
             him.save()
         if 'HTTP_X_RESTRICT_REMOVE' in request.META:
-            him.as_participant.enroll_restricted = False
-            him.as_participant.save()
+            him.enroll_restricted = False
+            him.save()
         if 'HTTP_X_RESTRICT_ADD' in request.META:
-            him.as_participant.enroll_restricted = True
-            him.as_participant.save()
+            him.enroll_restricted = True
+            him.save()
         
         data = {'edited':True}
         
@@ -409,6 +410,7 @@ def user_edit(request, his_user_id):
 def serialize_course(self, participant):
     return {
         'name': self.name,
+        'description': self.description,
         'published': self.published,
         'done': self.completed_participants.filter(id=participant.id).count(),
         'instructor': [him.id for him in self.instructor.all()],

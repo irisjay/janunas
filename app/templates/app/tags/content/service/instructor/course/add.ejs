@@ -1,6 +1,7 @@
 <model-themer>
     <fieldset>
         <label>Course name:<input name="course_name" type="text" placeholder="Wow. Such course."></label>
+        <label>Course description:<textarea name="component_description" cols="40" rows="3" placeholder="Much course" /></label>
     </fieldset>
     
     <button type="submit" name="add_course">
@@ -12,6 +13,7 @@
 (function (self) {
     self .on ('mount', function () {
         var course_name = self .root .querySelector ('input[name="course_name"]');
+        var component_description = self .root .querySelector ('input[name="component_description"]');
         var add_course = self .root .querySelector ('button[name="add_course"]');
         
         add_course .addEventListener ('click', function () {
@@ -21,7 +23,8 @@
                 }
             })
             self .stuff .trigger ('new', {
-                course_name: course_name .value
+                course_name: course_name .value,
+                component_description: component_description .value
             });
         });
     });

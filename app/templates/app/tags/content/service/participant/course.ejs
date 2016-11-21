@@ -3,6 +3,7 @@
     <h2 if={ (piece (((get_cache (backend_path + '/my/courses') || {}) .as_participant || {}) .enrolled_courses) || {}) [recalls ('course_id') || ''] }><mark>{ ((recalls ('course') || {}) .course || {}) .name }</mark></h2>
     <h2 if={ ! (piece (((get_cache (backend_path + '/my/courses') || {}) .as_participant || {}) .enrolled_courses) || {}) [recalls ('course_id') || ''] && (piece (((get_cache (backend_path + '/my/courses') || {}) .as_participant || {}) .completed_courses) || {}) [recalls ('course_id') || ''] }><strike>{ ((recalls ('course') || {}) .course || {}) .name }</strike></h2>
     <h2 if={ ! (piece (((get_cache (backend_path + '/my/courses') || {}) .as_participant || {}) .enrolled_courses) || {}) [recalls ('course_id') || ''] && ! (piece (((get_cache (backend_path + '/my/courses') || {}) .as_participant || {}) .completed_courses) || {}) [recalls ('course_id') || ''] }>{ ((recalls ('course') || {}) .course || {}) .name }</h2>
+    <p>{ ((recalls ('course') || {}) .course || {}) .description }</p>
     
     <button disabled if={ (piece (((get_cache (backend_path + '/my/courses') || {}) .as_participant || {}) .enrolled_courses) || {}) [recalls ('course_id') || ''] }>
         You are already enrolled in this course
