@@ -7,7 +7,7 @@ body {
     width: 100% !important;
     height: 100% !important;
     position: relative;
-    overflow: hidden;
+    overflow: scroll;
 }
 
 .border {
