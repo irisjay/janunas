@@ -2,7 +2,7 @@
 
 <script>
 (function (self) {
-	if (get_cache (backend_path + '/login')) {
+	if (get_cache (backend_path + '/login') && ! get_cache (backend_path + '/login') .error) {
 		window .location .hash = '#service'
 	}
 	
