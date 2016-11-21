@@ -13,7 +13,7 @@
 	
 	<table>
 		<tr><th>All Users</th><th></th><th></th></tr>
-		<tr each={ id, user in piece ((recalls ('all-users') || {}) .users || {}) }
+		<tr each={ id, user in piece ((recalls ('all-users') || {}) .users) }
 			riot-script={ (<%- __(function (self, user) {
 				var buttons_work =	function () {
 										util .user_edit (user .id) (self);
