@@ -77,8 +77,6 @@
 			><td if={ user .administrator }><button to="revoke_administrator">Revoke Admin</button></td
 			><td if={ ! user .instructor }><button type="submit" to="make_instructor">Make Instructor</button></td
 			><td if={ user .instructor }><button to="unmake_instructor">Unmake Instructor</button></td
-			><td if={ ! user .enroll_restricted }><button to="restrict_enrolling">Restrict Enrolling</button></td
-			><td if={ user .enroll_restricted }><button type="submit" to="unrestrict_enrolling">Unrestrict Enrolling</button></td
 		></tr>
 	</table>
 </model-themer>

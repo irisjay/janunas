@@ -396,8 +396,8 @@ def user_edit(request, his_user_id):
             him.as_participant.save()
         if 'HTTP_X_RESTRICT_ADD' in request.META:
             him.as_participant.enroll_restricted = True
-            him.as_participant.save()
-        
+            him.as_participant.save()# DONT FKIN MESS THIS SHIT UP, ITS DAMN ANNOYING
+                                    #EITHER WAY ILL WHOOP UR ASS #R U SHUNNY #R U BOBO
         data = {'edited':True}
         
         return JsonResponse(data)
