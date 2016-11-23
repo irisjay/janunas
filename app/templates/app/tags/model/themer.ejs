@@ -1,23 +1,52 @@
-<section>
-    <article><yield></yield></article>
-    <footer><button name="logout">Logout</button><button name="service">Services</button></footer>
-</section>
+<!-- Navigation -->
+<nav class="nav">
+  <div class="nav-left">
+    <a class="nav-item is-brand" href="#">
+      <img src="http://bulma.io/images/bulma-type.png" alt="Bulma logo">
+    </a>
+  </div>
+
+  <span class="nav-toggle">
+    <span></span>
+    <span></span>
+    <span></span>
+  </span>
+
+  <div class="nav-right nav-menu">
+    <a class="nav-item" href="#">
+      Participant
+    </a>
+    <a class="nav-item" href="#">
+      Instructor
+    </a>
+    <a class="nav-item" href="#">
+      Administrator
+    </a>
+
+    <span class="nav-item">
+      <a class="button" name="logout" >
+        <span class="icon">
+          <i class="fa fa-sign-out"></i>
+        </span>
+        <span>Logout</span>
+      </a>
+    </span>
+  </div>
+</nav>
+
+<yield />
 
 <script>
 (function (self) {
     util .logout (self);
     
     self .on ('mount', function () {
-        var logout = self .root .querySelector ('button[name="logout"]');
-        var service = self .root .querySelector ('button[name="service"]');
+        var logout = self .root .querySelector ('[name="logout"]');
         logout .addEventListener ('click', function () {//debugger;
             self .stuff .one ('logout', function () {
-                window .location .hash = '#login';
+                window .location .hash = '#home';
             });
             self .stuff .trigger ('logout');
-        });
-        service .addEventListener ('click', function () {//debugger;
-            window .location .hash = '#service';
         });
     });
 })(this);

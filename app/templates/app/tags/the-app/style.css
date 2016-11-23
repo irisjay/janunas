@@ -1,17 +1,14 @@
-#header{
-    background-color: #000000;
-}
+
 
 html {
-    width: 100vw !important;
-    height: 100vh !important;
+    width: 100% !important;
+    height: 100% !important;
 }
 
 body {
     width: 100% !important;
     height: 100% !important;
     position: relative;
-    overflow: scroll;
 }
 
 .border {
@@ -707,9 +704,7 @@ body {
     display: none;
 }
 
-.content {
-    min-height: 100%;
-}
+
 
 
 .dashed {

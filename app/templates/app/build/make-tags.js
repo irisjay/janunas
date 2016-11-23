@@ -43,9 +43,12 @@ var tags_info =	tag_files .map (function (filepath) {
 													console: console,
 													__dirname: tag_info .path .split ('/') .slice (0, -1) .join ('/'),
 													__filename: tag_info .path,
+													__file: tag_info .path .split ('.') .slice (0, -1) .join ('.') + '/',
 													tags_info: tags_info,
 													__: __function,
-													tag: tag_info .tag
+													tag: tag_info .tag,
+													render: function (template) { return ejs .render (template, { require: require, module: module, console: console, __dirname: tag_info .path .split ('/') .slice (0, -1) .join ('/'), __filename: tag_info .path, __file: tag_info .path .split ('.') .slice (0, -1) .join ('.') + '/' }); },
+													src:	function (path) { return fs .readFileSync (path, 'utf8'); }
 												}
 											)
 										) + '\n' +

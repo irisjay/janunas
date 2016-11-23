@@ -4,6 +4,7 @@
   "description": "you killary.",
   "main": "server.js",
   "dependencies": {
+    "datauri": "^1.0.4",
     "ejs": "^2.4.1",
     "escape-html": "^1.0.3",
     "riot-compiler": "^2.5.5"

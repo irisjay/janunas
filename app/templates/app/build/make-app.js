@@ -13,6 +13,9 @@ process .stdout .write (
 			module: module,
 			console: console,
 			__dirname: app_file .split ('/') .slice (0, -1) .join ('/'),
-			__filename: app_file
+			__filename: app_file,
+			__file: app_file .split ('.') .slice (0, -1) .join ('.') + '/',
+			render: ejs .render,
+			src:	function (path) { return fs .readFileSync (path, 'utf8'); }
 		}
 	));

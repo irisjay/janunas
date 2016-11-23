@@ -179,7 +179,7 @@ var tags = riot .mount ('*');
 					};
 	
 	if (! window .location .hash)
-		window .location .hash = '#login';
+		window .location .hash = '#home';
 	
 	window .addEventListener ('hashchange', reload);
 	reload ();

@@ -1,13 +1,24 @@
 <model-themer>
-    <model-loginner />
     
-    
-    <button type="submit" name="login">
-        Login!
-    </button>
-    <button type="submit" name="register">
-        Register!
-    </button>
+    <section class="hero is-fullheight">
+        <div class="hero-body">
+            <div class="container has-text-centered">
+                
+                <h1 class="title is-1">Log in.</h1>
+                
+                <model-loginner />
+                
+                <section class="section"></section>
+                
+                <button class="button is-large is-info" type="submit" name="login">
+                    Login
+                </button>
+                <button class="button is-large"  type="submit" name="register">
+                    Register
+                </button>
+            </div>
+        </div>
+    </section>
 </model-themer>
 
 <script>(function (self) {
