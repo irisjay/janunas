@@ -1,88 +1,99 @@
 <layout-default>
-    
-    <div id="wrap">
-		<div id="content">
-		    <h2 style="margin:20px">{ ((assemble (((recalls ('course') || {}) .course || {}) .module_set) || {}) [recalls ('module_order')] || {}) .name }</h2>
-    
-            <table style="margin:20px">
-                <tr><th>Components</th><th></th></tr>
-        		<tr each={ assemble (((assemble (((recalls ('course') || {}) .course || {}) .module_set) || {}) [recalls ('module_order')] || {}) .component_set) }
-        		    ><td><a href="#service/instructor/component/#{ recalls ('course_id') }/{ recalls ('module_order') }/{ order }">{ name }</a></td
-        		    ><td><button to="delete" order={ order }>x</button></td
-        		    ><td><button to="shift" order={ order }>shift</button></td
-        		></tr>
-            </table>
-            
-            <button type="submit" name="add_component" style="margin:20px">
-                Add component
-            </button>
-		</div>
-		<div style="clear: both;"> </div>
-	</div>
+	
+	<h2>{ value (my ('module_order'), '.name') (assemble (my ('course', '.course .module_set')))}</h2>
+
+	<table>
+		<tr><th>Components</th><th></th></tr>
+		<tr each={ value (my ('module_order'), '.component_set') (assemble (my ('course', '.course .module_set'))) ) }
+			><td><a href="#service/instructor/component/#{ recalls ('course_id') }/{ recalls ('module_order') }/{ order }">{ name }</a></td
+			><td><button order={ order } <%- ref ('delete_component') %> >x</button></td
+			><td><button order={ order } <%- ref ('shift_component') %> >shift</button></td
+		></tr>
+	</table>
+	
+	<button type="submit" <%- ref ('add_component') %> >
+		Add component
+	</button>
 
 </layout-default>
 
 <script>
-(function (self) {
-    self .on ('mount', function () {
-        var add_component = self .root .querySelector ('button[name="add_component"]');
-        
-        add_component .addEventListener ('click', function () {
-            window .location .hash = '#service/instructor/component/add/#' + self .recalls ('course_id') + '/' + self .recalls ('module_order')
-        });
-    });
-    self .on ('updated', function () {
-        [] .forEach .call (self .root .querySelectorAll ('button[to="delete"]'), function (delete_component) {
-            delete_component .addEventListener ('click', function () {
-                var order = delete_component .getAttribute ('order');
-                self .stuff .trigger ('delete', {
-                    component_order: +order
-                });
-            }, false);
-        });
-        [] .forEach .call (self .root .querySelectorAll ('button[to="shift"]'), function (shift_component) {
-            shift_component .addEventListener ('click', function () {
-                var order = shift_component .getAttribute ('order');
-                self .stuff .trigger ('reorder', {
-                    component_1_order: +order,
-                    component_2_order: (+order + 1) % assemble (((assemble (((self .recalls ('course') || {}) .course || {}) .module_set) || {}) [self .recalls ('module_order')] || {}) .component_set) .length
-                });
-            }, false);
-        });
-    });
-    
-    self .stuff .on ('course', function () {
-        self .update ();
-    });
-    self .stuff .on ('course_id', function () {
-        self .update ();
-    });
-    self .stuff .on ('module_order', function () {
-        self .update ();
-    });
-    
-    var leak = undefined;
-    
-    self .understands ('input');
-    self .stuff .on ('input', function (course_id, module_order) {
-        content .course (course_id) (self);
-        leak = setInterval (self .recalls .bind (self, 'course'), 300);
-        util .component_delete (course_id, module_order) (self);
-        util .component_reorder (course_id, module_order) (self);
-        
-	    display_errors ('course', self);
-	    display_errors ('delete', self);
-	    display_errors ('reorder', self);
-	    
-        remembers ({
-            course_id: course_id,
-            module_order: module_order
-        }) (self);
-    });
-    
-    self .on ('unmount', function () {
-        leak && clearInterval (leak);
-    });
-})(this);
+	(function (self) {
+		remembers ({
+			course: undefined,
+			course_id: undefined,
+			module_order: undefined
+		}) (self);
+		most .mergeArray ([
+			most .fromEvent ('course', self),
+			most .fromEvent ('course_id', self),
+			most .fromEvent ('module_order', self)
+		]) .observe (function () {
+			self .update ();
+		});
+		
+		
+		connects ({
+			add_component: each_ref ('add_component'),
+			delete_component: each_ref ('delete_component'),
+			shift_component: each_ref ('shift_component')
+		}) (self);
+		self .on ('add_component', function (add_component) {
+			add_component .addEventListener ('click', function () {
+				window .location .hash = '#service/instructor/component/add/#' + self .my ('course_id') + '/' + self .my ('module_order')
+			});
+		});
+		self .on ('delete_component', function (delete_component) {
+			delete_component .addEventListener ('click', function () {
+				var order = delete_component .getAttribute ('order');
+				self .emit ('delete', {
+					component_order: +order
+				});
+			});
+		});
+		self .on ('shift_component', function (shift_component) {
+			shift_component .addEventListener ('click', function () {
+				var order = shift_component .getAttribute ('order');
+				self .emit ('reorder', {
+					component_1_order: +order,
+					component_2_order: (+order + 1) % assemble (value ('.module_order .component_set') (assemble (self .my ('course', '.course .module_set')))) .length
+				});
+			});
+		});
+		
+		
+		remembers ({
+			delete: undefined,
+			reorder: undefined
+		}) (self);
+		most .mergeArray ([
+			most .fromEvent ('delete', self),
+			most .fromEvent ('reorder', self)
+		]) .observe (display_errors);
+		
+		
+		
+		
+		remembers ({
+			input:	function (args) {
+						var course_id = args [0];
+						var module_order = args [1];
+						
+						most .periodic (500)
+							.thru (content .course (course_id))
+							.tap (display_errors)
+							.observe (function (course) {
+								self .emit ('course', course);
+							});
+						self .emit ('course_id', course_id);
+						self .emit ('module_order', module_order);
+							
+						connects ({
+							delete: util .component_delete (course_id, module_order),
+							reorder: util .component_reorder (course_id, module_order)
+						}) (self);
+					}
+		});
+	})(this);
 </script>
 

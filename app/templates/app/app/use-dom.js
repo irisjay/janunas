@@ -1,14 +1,109 @@
-(function adjust_screen_size () {
-	document .body .style .setProperty ('width', window .innerWidth + 'px', 'important');
-	document .body .style .setProperty ('height', window .innerHeight + 'px', 'important');
-	window .addEventListener ('resize', function (event) {
-		if (window .innerWidth + 'px' !== document .body .style .width) {
-			document .body .style .setProperty ('width', window .innerWidth + 'px', 'important');
-			document .body .style .setProperty ('height', window .innerHeight + 'px', 'important');
-		}
-	});
-}) ();
+/*
+Use app
+*/
+document .addEventListener ('DOMContentLoaded', function () {
+	riot .mount ('*');
+});
+/*
+Catch errors
+*/
+riot .util .tmpl .errorHandler = log .error;/* now riot throws automatically. still catch with log? */
+window .onerror =   function (message, source, lineno, colno, error) {
+						if ((((message || {}) .srcElement || {}) .outerHTML || {} ) [0] === '<script src="cordova.js') {
+							log .error ('does not contain real cordova');
+						}
+						else if (message && message === "Uncaught TypeError: Cannot read property 'OneSignal' of undefined"
+								&& ((source || {}) .indexOf || function () {}) ('/js/use-onesignal.js') !== -1) {
+							log .error ('does not contain cordova onesignal');
+						}
+						else {
+							log .error ('error', arguments);
+							log .error ('stack', (error || {}) .stack);
+						}
+					};
+/*
+Use riot data layer
+*/
+riot .mixin (
+	{
+		init:	function () {
+					(function (self) {
+											var send_event =	function (element) {
+																	return	function (what, how) {
+																				element .dispatchEvent (
+																					new CustomEvent ('emit', { detail: { what: what, how: how }, bubbles: true } )
+																				);
+																			};
+																};
+						self .scope =	scope ({
+											//be child of riot parent
+											parent: (self .parent || {}) .scope,
+											//latch onto riot tag
+											extend: self,
+											__outgoing_knowledge: self,
+											//bubble as dom event on uncaptured
+											ex_emit: self .root .parentNode && send_event (self .root .parentNode),
+											//logging
+											on:	{
+													new_memory:	function (/*what, how, other args*/) {
+														            log ([self] .concat .apply ([] .slice .call (arguments)));
+																}
+												}
+										});
+										
+						self .my =	function (what, property_name) {
+										return value (property_name) (self .recalls (what));
+									};
+						self .self = self;
+						
+						remembers ({
+							refs: {}
+						});
+						
+				        //capturing bubbling events
+			        	self .root .addEventListener ('emit', function (event) {
+			        		var detail = event .detail;
+			        		self .emit (detail .what, detail .how);
+			        		event .stopPropagation ();
+			        		return false;
+			        	}, false);
+					}) (this);			
+				}
+	} );
+/*
+Polyfill for dom util methods
+*/
+window .Element && (function (ElementPrototype) {
+	ElementPrototype .matchesSelector =	ElementPrototype .matchesSelector 
+										|| ElementPrototype .mozMatchesSelector
+										|| ElementPrototype .msMatchesSelector
+										|| ElementPrototype .oMatchesSelector
+										|| ElementPrototype .webkitMatchesSelector
+										||	function (selector) {
+												var node = this, nodes = (node .parentNode || node .document) .querySelectorAll (selector), i = -1;
+										
+												while (nodes [++ i] && nodes [i] != node);
+										
+												return !!nodes[i];
+											};
+}) (Element. prototype);
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	
 var children =  function (el, selector) {
 					var selectors      = null,
 						children       = null,
@@ -35,6 +130,9 @@ var children =  function (el, selector) {
 				
 					return children;
 				};
+				
+				
+				
 var child =  function (el, selector) {
 	var tempId         = '';
 
@@ -68,20 +166,6 @@ var one_child =  function (el, selector) {
 
 	return child;
 };
-this .Element &&	function (ElementPrototype) {
-						ElementPrototype.matchesSelector = ElementPrototype.matchesSelector || 
-						ElementPrototype.mozMatchesSelector ||
-						ElementPrototype.msMatchesSelector ||
-						ElementPrototype.oMatchesSelector ||
-						ElementPrototype.webkitMatchesSelector ||
-						function (selector) {
-							var node = this, nodes = (node.parentNode || node.document).querySelectorAll(selector), i = -1;
-					
-							while (nodes[++i] && nodes[i] != node);
-					
-							return !!nodes[i];
-						}
-					} (Element. prototype);
 
 var closest_parent = function (el, selector) {
 						var includeSelf = true;
@@ -148,11 +232,3 @@ var swap_nodes =	function (obj1, obj2) {
 					        }
 					    }
 					};
-					
-					
-					
-					
-					
-					
-					
-					

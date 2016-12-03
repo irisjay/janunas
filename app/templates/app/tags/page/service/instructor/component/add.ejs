@@ -1,55 +1,86 @@
 <layout-default>
-    
-    <div id="wrap">
-        <div id="content">
-            <h2>Add Component</h2>
-            <label style="margin:20px">Component name: </label><br/>
-            <input name="component_name" type="text" style="width:400px; margin:20px">
-            <br/><br/>
-            <label style="margin:20px">Component content: </label><br/>
-            <textarea name="component_content" rows="3" style="width:400px; margin:20px" />
-            <br/>
-            <button type="submit" name="add_component" style="margin:20px">
-                Add component
-            </button>
-        </div>
-        <div style="clear: both;"> </div>
+	
+	<div id="wrap">
+		<div id="content">
+			<h2>Add Component</h2>
+			<label style="margin:20px">Component name: </label><br/>
+			<input type="text" style="width:400px; margin:20px" <%- ref ('component_name') %> >
+			<br/><br/>
+			<label style="margin:20px">Component content: </label><br/>
+			<textarea rows="3" style="width:400px; margin:20px" <%- ref ('component_content') %> />
+			<br/>
+			<button type="submit" style="margin:20px" <%- ref ('add_component') %> >
+				Add component
+			</button>
+		</div>
+		<div style="clear: both;"> </div>
 	</div>
-    
+	
 </layout-default>
 
 <script>
-(function (self) {
-    self .on ('mount', function () {
-        var component_name = self .root .querySelector ('input[name="component_name"]');
-        var component_content = self .root .querySelector ('textarea[name="component_content"]');
-        var add_component = self .root .querySelector ('button[name="add_component"]');
-        
-        add_component .addEventListener ('click', function () {
-            self .stuff .one ('new', function (response) {
-                if (! response .error) {
-                    //alert ('Component added')
-                    window .location .hash = '#service/instructor/module/#' + self .recalls ('course_id') + '/' + self .recalls ('module_order')
-                }
-            })
-            self .stuff .trigger ('new', {
-                component_name: component_name .value,
-                component_content: component_content .value
-            });
-        });
-    });
-
-    self .understands ('input');
-    self .stuff .on ('input', function (course_id, module_order) {
-        remembers ({
-            course_id: course_id,
-            module_order: module_order
-        }) (self);
-        
-        util .component_new (course_id, module_order) (self);
-        
-	    display_errors ('new', self);
-    });
-})(this);
+	(function (self) {
+		connects ({
+			component_name: each_ref ('component_name'),
+			component_content: each_ref ('component_content'),
+			add_component: each_ref ('add_component')
+		}) (self);
+		
+		remembers ({
+			input:	function (args) {
+						var course_id = args [0];
+						var module_order = args [1];
+						
+						self .on ('add_component', function (add_component) {
+							most .fromEvent ('click', add_component)
+								.map (function () {
+									return	{
+												component_name: component_name .value,
+												component_content: component_content .value
+											};
+								})
+								.thru (util .component_new (course_id, module_order))
+								.tap (display_errors)
+								.observe (function (response) {
+									if (! response .error) {
+										//alert ('Component added')
+										window .location .hash = '#service/instructor/module/#' + course_id + '/' + module_order
+									}
+								});
+						});
+					}
+		});
+		
+		/*
+		Fantasy l
+		
+		var course_id = undefined;
+		var module_order = undefined;
+		
+		remembers ({
+			input:	function (args) {
+						course_id = args [0];
+						module_order = args [1];
+					}
+		});
+		
+		
+		most .fromEvent ('click', add_component)
+			.map (function () {
+				return	{
+							component_name: component_name .value,
+							component_content: component_content .value
+						};
+			})
+			.thru (util .component_new (course_id, module_order))
+			.tap (display_errors)
+			.observe (function (response) {
+				if (! response .error) {
+					//alert ('Component added')
+					window .location .hash = '#service/instructor/module/#' + course_id + '/' + module_order
+				}
+			});
+		*/
+	})(this);
 </script>
 

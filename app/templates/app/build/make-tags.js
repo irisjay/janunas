@@ -3,6 +3,7 @@ var fs = require ('fs');
 var path = require ('path');
 var compiler = require ('riot-compiler');
 var tag_dir_path = path .join (__dirname, '/../tags');
+var style_dir_path = path .join (__dirname, '/../styles');
 
 				var get_files =	function (dir) {
 									var results = [];
@@ -38,17 +39,41 @@ var tags_info =	tag_files .map (function (filepath) {
 											ejs .render (
 												fs .readFileSync (tag_info .path, 'utf8'),
 												{
-													require: require,
-													module: module,
-													console: console,
+													/*
+													metainfo
+													*/
 													__dirname: tag_info .path .split ('/') .slice (0, -1) .join ('/'),
 													__filename: tag_info .path,
 													__file: tag_info .path .split ('.') .slice (0, -1) .join ('.') + '/',
 													tags_info: tags_info,
-													__: __function,
 													tag: tag_info .tag,
+													
+													
+													/*debugger*/
+													console: console,
+													
+													/*
+													macros
+													*/
+													ref:	function (ref) {
+																return " on_load={ self ['__ref__" + ref + "'] || (self ['__ref__" + ref + "'] = true, on ('mount', emit .bind (self, '" + ref + "', { add: root })), on ('updated', emit .bind (self, '" + ref + "', { change: root })), on ('unmount', emit .bind (self, '" + ref + "', { remove: root }))), undefined } ";
+															},
+													
+													
+													/*
+													renderers
+													*/
+													require: require,
+													__: __function,
 													render: function (template) { return ejs .render (template, { require: require, module: module, console: console, __dirname: tag_info .path .split ('/') .slice (0, -1) .join ('/'), __filename: tag_info .path, __file: tag_info .path .split ('.') .slice (0, -1) .join ('.') + '/' }); },
-													src:	function (path) { return fs .readFileSync (path, 'utf8'); }
+													src:	function (path) { return fs .readFileSync (path, 'utf8'); },
+													style:	function (file) { return fs .readFileSync (style_dir_path + '/' + file, 'utf8'); },
+													
+													
+													/*
+													userland info
+													*/
+													company_color: '#6a9f95'
 												}
 											)
 										) + '\n' +

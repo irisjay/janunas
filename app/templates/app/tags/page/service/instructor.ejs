@@ -1,25 +1,25 @@
 <layout-default>
-    
+	
 	<title>Instructor Services</title>
-    
+	
 	<div id="wrap">
-	    <h1>
-            Welcome Instructor!
-        </h1>
+		<h1>
+			Welcome Instructor!
+		</h1>
 		<div id="content">
 			<h2 style="margin:20px">Instructor Services</h2>
 			<p style="margin:20px">Please select what you desire to do.</p>
-			    <table style="margin:20px">
-                    <tr><th>Courses created by me</th></tr>
-                    <tr each={ (recalls ('my-courses') || {}) .as_instructor }
-                        ><td><a href="#service/instructor/course/#{ id }">{ name }</a></td
-            		    ><td><button to="delete" id={ id }>x</button></td
-            		></tr>
-                </table>
-    
-        <button type="submit" name="add_course" style="margin:20px">
-            Add course
-        </button>
+				<table style="margin:20px">
+					<tr><th>Courses created by me</th></tr>
+					<tr each={ my ('my_courses', '.as_instructor') }
+						><td><a href="#service/instructor/course/#{ id }">{ name }</a></td
+						><td><button course={ id } <%- ref ('delete_course') %> >x</button></td
+					></tr>
+				</table>
+	
+		<button type="submit" style="margin:20px" <%- ref ('add_course') %> >
+			Add course
+		</button>
 			
 		</div>
 		<div style="clear: both;"> </div>
@@ -29,48 +29,41 @@
 
 <script>
 (function (self) {
-    self .on ('mount', function () {
-        var add_course = self .root .querySelector ('button[name="add_course"]');
-        
-        add_course .addEventListener ('click', function () {
-            window .location .hash = '#service/instructor/course/add'
-        });
-        
-        [] .forEach .call (self .root .querySelectorAll ('button[to="delete"]'), function (delete_course) {//log('hey');
-            delete_course .addEventListener ('click', function () {//log('hi')
-                var id = delete_course .getAttribute ('id');
-                self .stuff .trigger ('delete', {
-                    course_id: id
-                });
-            }, false);
-        });
-    });
-    self .on ('updated', function () {//log('hoo');
-        [] .forEach .call (self .root .querySelectorAll ('button[to="delete"]'), function (delete_course) {//log('hey');
-            delete_course .addEventListener ('click', function () {//log('hi')
-                var id = delete_course .getAttribute ('id');
-                self .stuff .trigger ('delete', {
-                    course_id: id
-                });
-            }, false);
-        });
-    });
-    
-    self .stuff .on ('my-courses', function () {
-        self .update ();
-    });
-    
-    var leak = undefined;
-    
-    content .my_courses (self);
-    leak = setInterval (self .recalls .bind (self, 'my-courses'), 300);
-    util .course_delete (self);
+	most .periodic (500)
+		.thru (content .my_courses)
+		.tap (display_errors)
+		.observe (function (my_courses) {
+			self .emit ('my_courses', my_courses);
+		});
 	
-	display_errors ('my-courses', self);
-    display_errors ('delete', self);
 	
-    self .on ('unmount', function () {
-        leak && clearInterval (leak);
-    });
+	remembers ({
+		my_courses: undefined
+	}) (self);
+	self .on ('my_courses', function () {
+		self .update ();
+	});
+	
+	
+	connects ({
+		add_course: each_ref ('add_course'),
+		delete_course: each_ref ('delete_course')
+	}) (self);
+	self .on ('add_course', function (add_course) {
+		add_course .addEventListener ('click', function () {
+			window .location .hash = '#service/instructor/course/add'
+		});
+	})
+	self .on ('delete_course', function (delete_course) {
+		var course_id = delete_course .getAttribute ('course');
+		most .fromEvent ('click', delete_course)
+			.map (function () {//log('hi')
+				return	{
+							course_id: id
+						};
+			})
+			.thru (util .course_delete)
+			.observe (display_errors);
+	})
 })(this);
 </script>

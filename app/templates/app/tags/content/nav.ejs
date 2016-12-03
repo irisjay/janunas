@@ -23,7 +23,7 @@
         </a>
         
         <span class="nav-item">
-            <a class="button" name="logout" >
+            <a class="button" <%- ref ('logout') %>>
                 <span class="icon">
                     <i class="fa fa-sign-out"></i>
                 </span>
@@ -35,7 +35,7 @@
 
 <style>
     <%- tag %> nav {
-        background-color: #6a9f95;
+        background-color: <%- company_color %>;
     }
     <%- tag %> nav .nav-item:not(:hover) {
         color: white !important;
@@ -44,16 +44,15 @@
 
 <script>
 (function (self) {
-    util .logout (self);
-    
-    self .on ('mount', function () {
-        var logout = self .root .querySelector ('[name="logout"]');
-        logout .addEventListener ('click', function () {//debugger;
-            self .stuff .one ('logout', function () {
+	connects ({
+		logout: each_ref ('logout')
+	}) (self);
+	self .on ('logout',  function (logout) {
+        most .fromEvent ('click', logout)
+            .thru (util .logout)
+            .observe (function () {
                 window .location .hash = '#home';
             });
-            self .stuff .trigger ('logout');
-        });
-    });
+	});
 })(this);
 </script>

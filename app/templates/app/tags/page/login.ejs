@@ -1,70 +1,75 @@
 <layout-default>
-    
-    <section class="hero is-fullheight">
-        <div class="hero-body">
-            <div class="container has-text-centered">
-                
-                <h1 class="title is-1">Log in.</h1>
-                
-                <component-loginner />
-                
-                <section class="section"></section>
-                
-                <button class="button is-large is-info" type="submit" name="login">
-                    Login
-                </button>
-                <button class="button is-large"  type="submit" name="register">
-                    Register
-                </button>
-            </div>
-        </div>
-    </section>
+	
+	<section class="hero is-fullheight">
+		<div class="hero-body">
+			<div class="container has-text-centered">
+				
+				<h1 class="title is-1">Log in.</h1>
+				
+				<component-loginner username__from="username" password__from="password" />
+				
+				<section class="section"></section>
+				
+				<button class="button is-large is-info" type="submit" <%- ref ('login') %>>
+					Login
+				</button>
+				<button class="button is-large" type="submit" <%- ref ('register') %>>
+					Register
+				</button>
+			</div>
+		</div>
+	</section>
 </layout-default>
 
-<script>(function (self) {
-    remembers ({
-        username: undefined,
-        password: undefined
-    }) (self);
-    
-    self .on ('mount', function () {
-        var login = self .root .querySelector ('button[name="login"]');
-        var register = self .root .querySelector ('button[name="register"]');
-        
-        login .addEventListener ('click', function () {
-            self .stuff .trigger ('login', {
-                username: self .recalls ('username'),
-                password: self .recalls ('password')
-            });
-            self .stuff .one ('login', function (response) {
-                if (! response .error) {
-                    window .location .hash = '#service'
-                }
-            });
-        });
-        register .addEventListener ('click', function () {
-            self .stuff .trigger ('register', {
-                username: self .recalls ('username'),
-                password: self .recalls ('password')
-            });
-            self .stuff .one ('register', function (response) {
-                if (! response .error) {
-                    alert ('Successfully registered!');
-                }
-            });
-        });
-    });
-    
-	if (get_cache (backend_path + '/login') && ! get_cache (backend_path + '/login') .error) {
-		window .location .hash = '#service'
-	}
-	
-	util .register (self);
-	util .login (self);
-	
-	display_errors ('register', self);
-	display_errors ('login', self);
-	
-})(this);
+<script>
+	(function (self) {
+		if (get_cache (backend_path + '/login') && ! get_cache (backend_path + '/login') .error) {
+			window .location .hash = '#service'
+		}
+		
+		
+		remembers ({
+			username: undefined,
+			password: undefined
+		}) (self);
+		
+		
+		connects ({
+			login: each_ref ('login'),
+			register: each_ref ('register')
+		}) (self);
+		self .on ('login',  function (login) {
+			most .fromEvent ('click', login)
+				.map (function () {
+					return	{
+								username: self .my ('username'),
+								password: self .my ('password')
+							}
+				})
+				.thru (util .login)
+				.tap (display_errors)
+				.observe (function (response) {
+					if (! response .error) {
+						window .location .hash = '#service'
+					}
+				});
+		});
+		self .on ('register',  function (register) {
+			most .fromEvent ('click', register)
+				.map (function () {
+					return	{
+								username: self .my ('username'),
+								password: self .my ('password')
+							}
+				})
+				.thru (util .register)
+				.tap (display_errors)
+				.observe (function (response) {
+					if (! response .error) {
+						alert ('Successfully registered!');
+					}
+				});
+		});
+	})(this);
 </script>
 

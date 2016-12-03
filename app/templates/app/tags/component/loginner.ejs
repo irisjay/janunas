@@ -1,22 +1,25 @@
 <p class="control has-addons has-addons-centered">
-    <input name="username" type="text" placeholder="Username">
+    <input type="text" placeholder="Username" <%- ref ('username') %>>
 </p>
 <p class="control has-addons has-addons-centered">
-    <input name="password" type="password" placeholder="Password">
+    <input type="password" placeholder="Password" <%- ref ('password') %>>
 </p>
 
 <script>
-(function (self) {
-    self .on ('mount', function () {
-        var username = self .root .querySelector ('input[name="username"]');
-        var password = self .root .querySelector ('input[name="password"]');
-        
-        username .addEventListener ('input', function () {
-            self .stuff .trigger ('username', username .value);
+    (function (self) {
+        connects ({
+            username: each_ref ('username'),
+            password: each_ref ('password')
+        }) (self);
+        self .on ('username', function (username) {
+            username .addEventListener ('input', function () {
+                self .emit (opts .username__from, username .value);
+            });
         });
-        password .addEventListener ('input', function () {
-            self .stuff .trigger ('password', password .value);
+        self .on ('password', function (password) {
+            password .addEventListener ('input', function () {
+                self .emit (opts .password__from, password .value);
+            });
         });
-    });
-})(this);
+    })(this);
 </script>

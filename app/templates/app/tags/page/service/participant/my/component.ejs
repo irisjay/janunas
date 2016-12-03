@@ -1,76 +1,136 @@
 <layout-default>
-    
+	
 	<div id="wrap">
 		<div id="content">
 			<h2>Components</h2>
-			    <h2 if={ ((assemble (((assemble (((recalls ('course') || {}) .course || {}) .module_set) || {}) [recalls ('module_order')] || {}) .component_set) || {}) [recalls ('component_order')] || {}) .done } ><strike>{ ((assemble (((assemble (((recalls ('course') || {}) .course || {}) .module_set) || {}) [recalls ('module_order')] || {}) .component_set) || {}) [recalls ('component_order')] || {}) .name }</strike></h2>
-                <h2 if={ ! ((assemble (((assemble (((recalls ('course') || {}) .course || {}) .module_set) || {}) [recalls ('module_order')] || {}) .component_set) || {}) [recalls ('component_order')] || {}) .done } >{ ((assemble (((assemble (((recalls ('course') || {}) .course || {}) .module_set) || {}) [recalls ('module_order')] || {}) .component_set) || {}) [recalls ('component_order')] || {}) .name }</h2>
-                <p>{ ((assemble (((assemble (((recalls ('course') || {}) .course || {}) .module_set) || {}) [recalls ('module_order')] || {}) .component_set) || {}) [recalls ('component_order')] || {}) .content }</p>
-                
-                <button disabled if={ ((assemble (((assemble (((recalls ('course') || {}) .course || {}) .module_set) || {}) [recalls ('module_order')] || {}) .component_set) || {}) [recalls ('component_order')] || {}) .done } >
-                    Already done
-                </button>
-                <button type="submit" name="done_component" if={ ! ((assemble (((assemble (((recalls ('course') || {}) .course || {}) .module_set) || {}) [recalls ('module_order')] || {}) .component_set) || {}) [recalls ('component_order')] || {}) .done } >
-                    I am done
-                </button>    
+				<h2 if={
+							value (my ('component_order'), '.done' ) (
+								assemble (
+									value (my ('module_order'), '.component_set') (
+										assemble (my ('course', '.course .module_set'))
+									)
+								)
+							)
+					} ><strike>{ 
+							value (my ('component_order'), '.name' ) (
+								assemble (
+									value (my ('module_order'), '.component_set') (
+										assemble (my ('course', '.course .module_set'))
+									)
+								)
+							)
+					}</strike
+				></h2>
+				<h2 if={
+							! value (my ('component_order'), '.done' ) (
+								assemble (
+									value (my ('module_order'), '.component_set') (
+										assemble (my ('course', '.course .module_set'))
+									)
+								)
+							)
+					 } >{
+					 		
+							value (my ('component_order'), '.name' ) (
+								assemble (
+									value (my ('module_order'), '.component_set') (
+										assemble (my ('course', '.course .module_set'))
+									)
+								)
+							)
+				}</h2>
+				<p>{
+							value (my ('component_order'), '.content' ) (
+								assemble (
+									value (my ('module_order'), '.component_set') (
+										assemble (my ('course', '.course .module_set'))
+									)
+								)
+							)
+				}</p>
+				
+				<button disabled if={
+										value (my ('component_order'), '.done' ) (
+											assemble (
+												value (my ('module_order'), '.component_set') (
+													assemble (my ('course', '.course .module_set'))
+												)
+											)
+										)
+					} >
+					Already done
+				</button>
+				<button type="submit" if={
+																	! value (my ('component_order'), '.done' ) (
+																		assemble (
+																			value (my ('module_order'), '.component_set') (
+																				assemble (my ('course', '.course .module_set'))
+																			)
+																		)
+																	)
+					} <%- ref ('done_component') %> >
+					I am done
+				</button>    
 			
 		</div>
 		<div style="clear: both;"> </div>
 	</div>
-    
+	
 </layout-default>
 
 <script>
-(function (self) {
-    self .on ('mount', function () {
-        var done_component = self .root .querySelector ('button[name="done_component"]');
-        
-        done_component && done_component .addEventListener ('click', function () {
-            self .stuff .trigger ('done');
-        }, false);
-    });
-    self .on ('updated', function () {
-        var done_component = self .root .querySelector ('button[name="done_component"]');
-        
-        done_component && done_component .addEventListener ('click', function () {
-            self .stuff .trigger ('done');
-        }, false);
-    });
-    
-    self .stuff .on ('course', function () {
-        self .update ();
-    });
-    self .stuff .on ('course_id', function () {
-        self .update ();
-    });
-    self .stuff .on ('module_order', function () {
-        self .update ();
-    });
-    self .stuff .on ('component_order', function () {
-        self .update ();
-    });
+(function (self) {		
+	remembers ({
+		course: undefined,
+		module_order: undefined,
+		component_order: undefined
+	}) (self);
 
-    var leak = undefined;
-    
-    self .understands ('input');
-    self .stuff .on ('input', function (course_id, module_order, component_order) {
-        content .course (course_id) (self);
-        leak = setInterval (self .recalls .bind (self, 'course'), 300);
-        util .component_done (course_id, module_order, component_order) (self);
-        
-	    display_errors ('course', self);
-	    display_errors ('done', self);
-	    
-        remembers ({
-            course_id: course_id,
-            module_order: module_order,
-            component_order: component_order
-        }) (self);
-    });
-    
-    self .on ('unmount', function () {
-        leak && clearInterval (leak);
-    });
+
+	connects ({
+		done_component:	each_ref ('done_component')
+	}) (self);
+
+
+
+
+	remembers ({
+		input:	function (args) {
+					var course_id = args [0];
+					var module_order = args [1];
+					var component_order = args [2];
+					
+					
+					most .periodic (500)
+						.thru (content .course (course_id))
+						.tap (display_errors)
+						.observe (function (course) {
+							self .emit ('course', course)
+						});
+					remembers ({
+						module_order: module_order,
+						component_order: component_order
+					}) (self);
+					
+							
+					most .mergeArray ([
+						most .fromEvent ('course', self),
+						most .fromEvent ('module_order', self),
+						most .fromEvent ('component_order', self)
+					])
+					.tap (display_errors)
+					.observe (function () {
+						self .update ();
+					});
+					
+					
+					self .on ('done_component',	function (done_component) {
+						most .fromEvent ('click', done_component)
+							.thru (util .component_done (course_id, module_order, component_order))
+							.observe (display_errors);
+					});
+				}
+	}) (self);
 })(this);
 </script>
 

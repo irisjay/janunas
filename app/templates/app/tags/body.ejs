@@ -1,0 +1,52 @@
+<style>
+<%- style ('style.css') %>
+<%- style ('bulma.css') %>
+</style>
+
+<script>
+	(function (self) {
+		var page;
+		
+		var load_tag =	function (tag, args) {
+							var time = new Date ();
+								if (! page || page .root .getAttribute ('data-is') !== tag) {
+									if (page)
+										page .unmount ();
+									var page_root = document .createElement (tag);
+									self .root .insertBefore (page_root, null);
+									page = riot .mount (page_root, tag) [0];
+								}
+	
+								page .emit ('input', args);
+							log ('update page time ' + (new Date () - time) + 'ms', arguments);	
+							return tag;
+						};
+							
+		var reload =	function () {
+							load_tag (tag_name (page_name (window .location .hash)), page_arguments (window .location .hash));
+						};
+							var tag_name =	function (page_name) {
+												return 'page-' + replace_all ('/', '-') (trim_trailing_slash (page_name));
+											};
+												var trim_trailing_slash =	function (path) {
+																				if (path [path .length - 1] === '/')
+																					return path .slice (0, -1);
+																				else
+																					return path;
+																			};
+												
+							var page_name =	function (path) {
+												return path .slice (path .indexOf ('#') + 1, path .indexOf ('/#') === -1 ? undefined : path .indexOf ('/#'));
+											};
+							var page_arguments =	function (path) {
+														return (path .indexOf ('/#') !== -1 ? path .slice (path .indexOf ('/#') + 2) .split ('/') : []);
+													};
+		
+		if (! window .location .hash)
+			window .location .hash = '#home';
+		
+		window .addEventListener ('hashchange', reload);
+		reload ();
+							
+	})(this);
+</script>

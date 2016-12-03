@@ -15,17 +15,17 @@
 			<ul> 
 			
 			    <li>
-			        <button type="submit" name="as_participant">
+			        <button type="submit" <%- ref ('as_participant') %> >
                         Participant services
                     </button>
 			    </li> <br/>
 			    <li>
-			        <button type="submit" name="as_instructor" if={ (get_cache (backend_path + '/login') || {}) .as_instructor }>
+			        <button type="submit" if={ value ('.as_instructor') (get_cache (backend_path + '/login')) } <%- ref ('as_instructor') %> >
                         Instructor services
                     </button>
 			    </li> <br/>
 			    <li>
-			        <button type="submit" name="as_administrator" if={ (get_cache (backend_path + '/login') || {}) .as_administrator }>
+			        <button type="submit" if={ value ('.as_administrator') (get_cache (backend_path + '/login')) } <%- ref ('as_administrator') %> >
                         Administrator services
                     </button>
 			    </li> <br/>
@@ -42,24 +42,31 @@
 
 </layout-default>
 
-<script>(function (self) {
-    if (! (get_cache (backend_path + '/login') || {}) .id)
-        window .location .hash = '#login';
-    
-    self .on ('mount', function () {
-        var as_participant = self .root .querySelector ('button[name="as_participant"]');
-        var as_instructor = self .root .querySelector ('button[name="as_instructor"]');
-        var as_administrator = self .root .querySelector ('button[name="as_administrator"]');
+<script>
+    (function (self) {
+        if (! value ('.id') (get_cache (backend_path + '/login')) )
+            window .location .hash = '#login';
         
-        as_participant .addEventListener ('click', function () {
-            window .location .hash = '#service/participant';
+        
+        connnects ({
+            as_participant: each_ref ('as_participant'),
+            as_instructor: each_ref ('as_instructor'),
+            as_administrator: each_ref ('as_administrator')
+        }) (self);
+        self .on ('as_participant', function (as_participant) {
+            as_participant .addEventListener ('click', function () {
+                window .location .hash = '#service/participant';
+            });
+        }); 
+        self .on ('as_instructor', function (as_instructor) {
+            as_instructor .addEventListener ('click', function () {
+                window .location .hash = '#service/instructor';
+            });
+        }); 
+        self .on ('as_administrator', function (as_administrator) {
+            as_administrator .addEventListener ('click', function () {
+                window .location .hash = '#service/administrator';
+            });
         });
-        as_instructor && as_instructor .addEventListener ('click', function () {
-            window .location .hash = '#service/instructor';
-        });
-        as_administrator && as_administrator .addEventListener ('click', function () {
-            window .location .hash = '#service/administrator';
-        });
-    });
-    
-})(this);</script>
+    })(this);
+</script>

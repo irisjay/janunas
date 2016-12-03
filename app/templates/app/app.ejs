@@ -1,20 +1,19 @@
 <!DOCTYPE html>
 <html>
 	<head>
-		<script><%- src (__file + 'log.js') %></script>
-		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1">
-		<title></title>
-	</head>
-	<body>
-		<the-app></the-app>
-
-		<!-- your app's js -->
+		
+		<!-- polyfills -->
+		<script><%- src (__file + 'log.js') %></script>
 		<script><%- src (__file + 'promise.js') %></script>
 		<script><%- src (__file + 'fetch.js') %></script>
 		<script><%- src (__file + 'riot.min.js') %></script>
-		<script><%- src (__file + 'util.js') %></script>
+		<script><%- src (__file + 'most.js') %></script>
+		<script><%- src (__file + 'dom-scope.js') %></script>
+		<script><%- src (__file + 'globals.js') %></script>
+		<!-- setup -->
+		<script><%- src (__file + 'use-dom.js') %></script>
+		<script><%- src (__file + 'api.js') %></script>
 		<script><%- src (__file + 'tags.js') %></script>
-		<script><%- src (__file + 'use-riot.js') %></script>
-	</body>
+	</head>
 </html>

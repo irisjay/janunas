@@ -4,9 +4,9 @@
         <div id="content">
             <h2>Add Module</h2><br/>
                 <label style="margin:20px">Module name: </label><br/>
-                <input name="module_name" type="text" style="width:400px; margin:20px">
+                <input ref="module_name" type="text" style="width:400px; margin:20px">
                 <br/>
-            <button type="submit" name="add_module" style="margin:20px">
+            <button type="submit" ref="add_module" style="margin:20px">
                 Add module
             </button>
         </div>
@@ -15,40 +15,37 @@
     
 </layout-default>
 
-<script>
-(function (self) {
-    self .on ('mount', function () {
-        var module_name = self .root .querySelector ('input[name="module_name"]');
-        var add_module = self .root .querySelector ('button[name="add_module"]');
-        
-        add_module .addEventListener ('click', function () {
-            self .stuff .one ('new', function (response) {
-                if (! response .error) {
-                    //alert ('Module added')
-                    window .location .hash = '#service/instructor/course/#' + self .recalls ('course_id')
-                }
-            })
-            self .stuff .trigger ('new', {
-                module_name: module_name .value
-            });
-        });
-    });
-
-    self .understands ('input');
-    self .stuff .on ('input', function (course_id) {
-        remembers ({
-            course_id: course_id
-        }) (self);
-        
-        util .module_new (course_id) (self);
-        
-	    display_errors ('new', self);
-    });
-})(this);
-</script>
-
 <style>
     #content{
         height:70%;
     }
 </style>
+
+<script>
+    (function (self) {
+        var module_name = self .refs .module_name;
+        var add_module = self .refs .add_module;
+        
+		
+		remembers ({
+			input:	function (args) {
+						var course_id = args [0];
+						
+						most .fromEvent ('click', add_module)
+							.map (function () {
+								return	{
+                                            module_name: module_name .value
+										};
+							})
+							.thru (util .module_new (course_id))
+							.tap (display_errors)
+							.observe (function (response) {
+								if (! response .error) {
+									//alert ('Component added')
+									window .location .hash = '#service/instructor/module/#' + course_id
+								}
+							});
+					}
+		});
+    })(this);
+</script>

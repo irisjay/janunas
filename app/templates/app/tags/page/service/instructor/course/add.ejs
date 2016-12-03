@@ -1,58 +1,59 @@
 <layout-default>
-    
-    <div id="wrap">
-        <div id="content">
-            <h2>Add Course</h2><br/>
-            <label style="margin:20px">Course name: </label><br/>
-            <input name="course_name" type="text" style="width:400px; margin:20px">
-            <br/><br/>
-            <label style="margin:20px">Course description: </label><br/>
-            <textarea name="course_description" rows="4" style="width:400px; margin:20px" />
-            <br/>
-            <br/>
-            <label style-"margin:20px">Course category: </label><br/>
-            <select id="course_category">
-                <option value="Mergers and Acquisitions">Mergers and Acquisitions</option>
-                <option value="Markets">Markets</option>
-                <option value="Risk Management">Risk Management</option>
-                <option value="Securities">Securities</option>
-                <option value="Financial Modeling">Financial Modeling</option>
-                <option value="Operations">Operations</option>
-                <option value="Information Technology">Information Technology</option>
-            </select>
-            <button type="submit" name="add_course" style="margin:20px">
-                Add course
-            </button>
-        </div>
-        <div style="clear: both;"> </div>
+	
+	<div id="wrap">
+		<div id="content">
+			<h2>Add Course</h2><br/>
+			<label style="margin:20px">Course name: </label><br/>
+			<input type="text" style="width:400px; margin:20px" <%- ref ('course_name') %> >
+			<br/><br/>
+			<label style="margin:20px">Course description: </label><br/>
+			<textarea rows="4" style="width:400px; margin:20px" <%- ref ('course_description') %> />
+			<br/>
+			<br/>
+			<label style-"margin:20px">Course category: </label><br/>
+			<select <%- ref ('course_category') %> >
+				<option value="Mergers and Acquisitions">Mergers and Acquisitions</option>
+				<option value="Markets">Markets</option>
+				<option value="Risk Management">Risk Management</option>
+				<option value="Securities">Securities</option>
+				<option value="Financial Modeling">Financial Modeling</option>
+				<option value="Operations">Operations</option>
+				<option value="Information Technology">Information Technology</option>
+			</select>
+			<button type="submit" style="margin:20px" <%- ref ('add_course') %> >
+				Add course
+			</button>
+		</div>
+		<div style="clear: both;"> </div>
 	</div>
-    
+	
 </layout-default>
 
 <script>
-(function (self) {
-    self .on ('mount', function () {
-        var course_name = self .root .querySelector ('input[name="course_name"]');
-        var course_description = self .root .querySelector ('textarea[name="course_description"]');
-        var course_category = self .root .querySelector ('select[name="course_category"]')
-        var add_course = self .root .querySelector ('button[name="add_course"]');
-        
-        add_course .addEventListener ('click', function () {
-            self .stuff .one ('new', function (response) {
-                if (! response .error) {
-                    window .location .hash = '#service/instructor/'
-                }
-            })
-            self .stuff .trigger ('new', {
-                course_name: course_name .value,
-                course_description: course_description .value,
-                course_category: course_category .value
-            });
-        });
-    });
-
-    util .course_new (self);
-    
-    display_errors ('new', self);
-})(this);
+	(function (self) {
+		connects ({
+			course_name: each_ref ('course_name'),
+			course_description: each_ref ('course_description'),
+			course_category: each_ref ('course_category'),
+			add_course: each_ref ('add_course')
+		}) (self);
+		
+		self .on ('add_course', function (add_course) {	
+			most .fromEvent ('click', add_course)
+				.map (function () {
+					return	{
+				                course_name: course_name .value,
+				                course_description: course_description .value,
+				                course_category: course_category .value
+				            };
+				})
+				.thru (util .course_new)
+				.tap (display_errors)
+				.observe (function (response) {
+					if (! response .error) {
+						window .location .hash = '#service/instructor/'
+					}
+				});
+		});
+	})(this);
 </script>

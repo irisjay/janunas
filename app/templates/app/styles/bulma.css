@@ -1,3 +1,25 @@
+/*! bulma.io v0.2.3 | MIT License | github.com/jgthms/bulma */
+@-webkit-keyframes spinAround {
+  from {
+    -webkit-transform: rotate(0deg);
+            transform: rotate(0deg);
+  }
+  to {
+    -webkit-transform: rotate(359deg);
+            transform: rotate(359deg);
+  }
+}
+@keyframes spinAround {
+  from {
+    -webkit-transform: rotate(0deg);
+            transform: rotate(0deg);
+  }
+  to {
+    -webkit-transform: rotate(359deg);
+            transform: rotate(359deg);
+  }
+}
+
 /*! minireset.css v0.0.2 | MIT License | github.com/jgthms/minireset.css */
 html,
 body,
@@ -83,29 +105,8 @@ th {
   text-align: left;
 }
 
-@-webkit-keyframes spin-around {
-  from {
-    -webkit-transform: rotate(0deg);
-            transform: rotate(0deg);
-  }
-  to {
-    -webkit-transform: rotate(359deg);
-            transform: rotate(359deg);
-  }
-}
-
-@keyframes spin-around {
-  from {
-    -webkit-transform: rotate(0deg);
-            transform: rotate(0deg);
-  }
-  to {
-    -webkit-transform: rotate(359deg);
-            transform: rotate(359deg);
-  }
-}
-
 html {
+  background-color: whitesmoke;
   font-size: 14px;
   -moz-osx-font-smoothing: grayscale;
   -webkit-font-smoothing: antialiased;
@@ -226,17 +227,6 @@ table th {
 
 table th {
   color: #363636;
-}
-
-@keyframes spin-around {
-  from {
-    -webkit-transform: rotate(0deg);
-            transform: rotate(0deg);
-  }
-  to {
-    -webkit-transform: rotate(359deg);
-            transform: rotate(359deg);
-  }
 }
 
 .is-block {
@@ -625,17 +615,6 @@ a.box:active {
   box-shadow: inset 0 1px 2px rgba(10, 10, 10, 0.2), 0 0 0 1px #00d1b2;
 }
 
-@keyframes spin-around {
-  from {
-    -webkit-transform: rotate(0deg);
-            transform: rotate(0deg);
-  }
-  to {
-    -webkit-transform: rotate(359deg);
-            transform: rotate(359deg);
-  }
-}
-
 .button {
   -moz-appearance: none;
   -webkit-appearance: none;
@@ -928,7 +907,7 @@ a.box:active {
 }
 
 .button.is-info {
-  background-color: #6a9f95;
+  background-color: #3273dc;
   border-width: 0;
   color: white;
 }
@@ -941,7 +920,7 @@ a.box:active {
 
 .button.is-info.is-inverted {
   background-color: white;
-  color: #6a9f95;
+  color: #3273dc;
 }
 
 .button.is-info.is-inverted:hover {
@@ -954,14 +933,14 @@ a.box:active {
 
 .button.is-info.is-outlined {
   background-color: transparent;
-  border-color: #6a9f95;
+  border-color: #3273dc;
   border-width: 1px;
-  color: #6a9f95;
+  color: #3273dc;
 }
 
 .button.is-info.is-outlined:hover, .button.is-info.is-outlined:focus {
-  background-color: #6a9f95;
-  border-color: #6a9f95;
+  background-color: #3273dc;
+  border-color: #3273dc;
   color: white;
 }
 
@@ -1131,8 +1110,8 @@ a.box:active {
 }
 
 .button.is-loading:after {
-  -webkit-animation: spin-around 500ms infinite linear;
-          animation: spin-around 500ms infinite linear;
+  -webkit-animation: spinAround 500ms infinite linear;
+          animation: spinAround 500ms infinite linear;
   border: 2px solid #dbdbdb;
   border-radius: 290486px;
   border-right-color: transparent;
@@ -1268,28 +1247,6 @@ a.box:active {
   font-size: 18px;
 }
 
-@keyframes spin-around {
-  from {
-    -webkit-transform: rotate(0deg);
-            transform: rotate(0deg);
-  }
-  to {
-    -webkit-transform: rotate(359deg);
-            transform: rotate(359deg);
-  }
-}
-
-@keyframes spin-around {
-  from {
-    -webkit-transform: rotate(0deg);
-            transform: rotate(0deg);
-  }
-  to {
-    -webkit-transform: rotate(359deg);
-            transform: rotate(359deg);
-  }
-}
-
 .input,
 .textarea {
   -moz-appearance: none;
@@ -1392,7 +1349,7 @@ a.box:active {
 
 .input.is-info,
 .textarea.is-info {
-  border-color: #6a9f95;
+  border-color: #3273dc;
 }
 
 .input.is-success,
@@ -1589,7 +1546,7 @@ a.box:active {
 }
 
 .select select.is-info {
-  border-color: #6a9f95;
+  border-color: #3273dc;
 }
 
 .select select.is-success {
@@ -1718,7 +1675,7 @@ a.box:active {
 }
 
 .help.is-info {
-  color: #6a9f95;
+  color: #3273dc;
 }
 
 .help.is-success {
@@ -1966,8 +1923,8 @@ a.box:active {
   -webkit-box-flex: 1;
       -ms-flex-positive: 1;
           flex-grow: 1;
-  -ms-flex-negative: 0;
-      flex-shrink: 0;
+  -ms-flex-negative: 1;
+      flex-shrink: 1;
 }
 
 .control.is-grouped.is-grouped-centered {
@@ -2003,8 +1960,8 @@ a.box:active {
 }
 
 .control.is-loading:after {
-  -webkit-animation: spin-around 500ms infinite linear;
-          animation: spin-around 500ms infinite linear;
+  -webkit-animation: spinAround 500ms infinite linear;
+          animation: spinAround 500ms infinite linear;
   border: 2px solid #dbdbdb;
   border-radius: 290486px;
   border-right-color: transparent;
@@ -2017,17 +1974,6 @@ a.box:active {
   position: absolute !important;
   right: 8px;
   top: 8px;
-}
-
-@keyframes spin-around {
-  from {
-    -webkit-transform: rotate(0deg);
-            transform: rotate(0deg);
-  }
-  to {
-    -webkit-transform: rotate(359deg);
-            transform: rotate(359deg);
-  }
 }
 
 .image {
@@ -2106,17 +2052,6 @@ a.box:active {
   width: 128px;
 }
 
-@keyframes spin-around {
-  from {
-    -webkit-transform: rotate(0deg);
-            transform: rotate(0deg);
-  }
-  to {
-    -webkit-transform: rotate(359deg);
-            transform: rotate(359deg);
-  }
-}
-
 .notification {
   background-color: whitesmoke;
   border-radius: 3px;
@@ -2172,7 +2107,7 @@ a.box:active {
 }
 
 .notification.is-info {
-  background-color: #6a9f95;
+  background-color: #3273dc;
   color: white;
 }
 
@@ -2260,11 +2195,11 @@ a.box:active {
 }
 
 .progress.is-info::-webkit-progress-value {
-  background-color: #6a9f95;
+  background-color: #3273dc;
 }
 
 .progress.is-info::-moz-progress-bar {
-  background-color: #6a9f95;
+  background-color: #3273dc;
 }
 
 .progress.is-success::-webkit-progress-value {
@@ -2301,17 +2236,6 @@ a.box:active {
 
 .progress.is-large {
   height: 20px;
-}
-
-@keyframes spin-around {
-  from {
-    -webkit-transform: rotate(0deg);
-            transform: rotate(0deg);
-  }
-  to {
-    -webkit-transform: rotate(359deg);
-            transform: rotate(359deg);
-  }
 }
 
 .table {
@@ -2453,17 +2377,6 @@ a.box:active {
 
 .table.is-striped tbody tr:nth-child(even):hover {
   background-color: whitesmoke;
-}
-
-@keyframes spin-around {
-  from {
-    -webkit-transform: rotate(0deg);
-            transform: rotate(0deg);
-  }
-  to {
-    -webkit-transform: rotate(359deg);
-            transform: rotate(359deg);
-  }
 }
 
 .title,
@@ -2662,17 +2575,6 @@ a.box:active {
   font-weight: 700;
 }
 
-@keyframes spin-around {
-  from {
-    -webkit-transform: rotate(0deg);
-            transform: rotate(0deg);
-  }
-  to {
-    -webkit-transform: rotate(359deg);
-            transform: rotate(359deg);
-  }
-}
-
 .block:not(:last-child) {
   margin-bottom: 20px;
 }
@@ -2837,8 +2739,8 @@ a.box:active {
 }
 
 .loader {
-  -webkit-animation: spin-around 500ms infinite linear;
-          animation: spin-around 500ms infinite linear;
+  -webkit-animation: spinAround 500ms infinite linear;
+          animation: spinAround 500ms infinite linear;
   border: 2px solid #dbdbdb;
   border-radius: 290486px;
   border-right-color: transparent;
@@ -2911,7 +2813,7 @@ a.box:active {
 }
 
 .tag.is-info {
-  background-color: #6a9f95;
+  background-color: #3273dc;
   color: white;
 }
 
@@ -3286,17 +3188,6 @@ a.box:active {
   color: #2aa198;
 }
 
-@keyframes spin-around {
-  from {
-    -webkit-transform: rotate(0deg);
-            transform: rotate(0deg);
-  }
-  to {
-    -webkit-transform: rotate(359deg);
-            transform: rotate(359deg);
-  }
-}
-
 .level-item .title,
 .level-item .subtitle {
   margin-bottom: 0;
@@ -3400,17 +3291,6 @@ a.box:active {
     -webkit-box-flex: 1;
         -ms-flex-positive: 1;
             flex-grow: 1;
-  }
-}
-
-@keyframes spin-around {
-  from {
-    -webkit-transform: rotate(0deg);
-            transform: rotate(0deg);
-  }
-  to {
-    -webkit-transform: rotate(359deg);
-            transform: rotate(359deg);
   }
 }
 
@@ -3657,12 +3537,12 @@ a.box:active {
 }
 
 .message.is-info .message-header {
-  background-color: #6a9f95;
+  background-color: #3273dc;
   color: white;
 }
 
 .message.is-info .message-body {
-  border-color: #6a9f95;
+  border-color: #3273dc;
   color: gray;
 }
 
@@ -3706,17 +3586,6 @@ a.box:active {
 .message.is-danger .message-body {
   border-color: #ff3860;
   color: gray;
-}
-
-@keyframes spin-around {
-  from {
-    -webkit-transform: rotate(0deg);
-            transform: rotate(0deg);
-  }
-  to {
-    -webkit-transform: rotate(359deg);
-            transform: rotate(359deg);
-  }
 }
 
 .modal-background {
@@ -3907,17 +3776,6 @@ a.box:active {
   display: flex;
 }
 
-@keyframes spin-around {
-  from {
-    -webkit-transform: rotate(0deg);
-            transform: rotate(0deg);
-  }
-  to {
-    -webkit-transform: rotate(359deg);
-            transform: rotate(359deg);
-  }
-}
-
 .nav-toggle {
   cursor: pointer;
   display: block;
@@ -4077,6 +3935,7 @@ a.nav-item.is-tab.is-active {
 
 @media screen and (max-width: 768px) {
   .nav-menu {
+    background-color: white;
     box-shadow: 0 4px 7px rgba(10, 10, 10, 0.1);
     left: 0;
     display: none;
@@ -4160,6 +4019,7 @@ a.nav-item.is-tab.is-active {
   -webkit-box-align: stretch;
       -ms-flex-align: stretch;
           align-items: stretch;
+  background-color: white;
   display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
@@ -4204,17 +4064,6 @@ a.nav-item.is-tab.is-active {
   .nav > .container > .nav-left > .nav-item.is-brand:first-child,
   .container > .nav > .nav-left > .nav-item.is-brand:first-child {
     padding-left: 20px;
-  }
-}
-
-@keyframes spin-around {
-  from {
-    -webkit-transform: rotate(0deg);
-            transform: rotate(0deg);
-  }
-  to {
-    -webkit-transform: rotate(359deg);
-            transform: rotate(359deg);
   }
 }
 
@@ -4292,17 +4141,6 @@ a.nav-item.is-tab.is-active {
     -webkit-box-ordinal-group: 2;
         -ms-flex-order: 1;
             order: 1;
-  }
-}
-
-@keyframes spin-around {
-  from {
-    -webkit-transform: rotate(0deg);
-            transform: rotate(0deg);
-  }
-  to {
-    -webkit-transform: rotate(359deg);
-            transform: rotate(359deg);
   }
 }
 
@@ -4390,17 +4228,6 @@ a.panel-block:hover {
 
 .panel:not(:last-child) {
   margin-bottom: 20px;
-}
-
-@keyframes spin-around {
-  from {
-    -webkit-transform: rotate(0deg);
-            transform: rotate(0deg);
-  }
-  to {
-    -webkit-transform: rotate(359deg);
-            transform: rotate(359deg);
-  }
 }
 
 .tabs {
@@ -4619,17 +4446,6 @@ a.panel-block:hover {
 .tabs.is-large.is-boxed a, .tabs.is-large.is-toggle a {
   padding-bottom: 13px;
   padding-top: 13px;
-}
-
-@keyframes spin-around {
-  from {
-    -webkit-transform: rotate(0deg);
-            transform: rotate(0deg);
-  }
-  to {
-    -webkit-transform: rotate(359deg);
-            transform: rotate(359deg);
-  }
 }
 
 .column {
@@ -5600,17 +5416,6 @@ a.panel-block:hover {
   }
 }
 
-@keyframes spin-around {
-  from {
-    -webkit-transform: rotate(0deg);
-            transform: rotate(0deg);
-  }
-  to {
-    -webkit-transform: rotate(359deg);
-            transform: rotate(359deg);
-  }
-}
-
 .tile {
   -webkit-box-align: stretch;
       -ms-flex-align: stretch;
@@ -5742,17 +5547,6 @@ a.panel-block:hover {
   }
 }
 
-@keyframes spin-around {
-  from {
-    -webkit-transform: rotate(0deg);
-            transform: rotate(0deg);
-  }
-  to {
-    -webkit-transform: rotate(359deg);
-            transform: rotate(359deg);
-  }
-}
-
 .hero-video {
   bottom: 0;
   left: 0;
@@ -5834,10 +5628,10 @@ a.panel-block:hover {
 }
 
 .hero {
-  background-color:#ffffff;
   -webkit-box-align: stretch;
       -ms-flex-align: stretch;
           align-items: stretch;
+  background-color: white;
   display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
@@ -6315,12 +6109,12 @@ a.panel-block:hover {
 }
 
 .hero.is-info {
-  background-color: #ffffff;
-  color: #0a0a0a;
+  background-color: #3273dc;
+  color: white;
 }
 
 .hero.is-info .title {
-  color: #0a0a0a;
+  color: white;
 }
 
 .hero.is-info .title a,
@@ -6329,7 +6123,7 @@ a.panel-block:hover {
 }
 
 .hero.is-info .subtitle {
-  color: #0a0a0a;
+  color: rgba(255, 255, 255, 0.9);
 }
 
 .hero.is-info .subtitle a,
@@ -6343,7 +6137,7 @@ a.panel-block:hover {
 
 @media screen and (max-width: 768px) {
   .hero.is-info .nav-menu {
-    background-color: #6a9f95;
+    background-color: #3273dc;
   }
 }
 
@@ -6382,12 +6176,12 @@ a.panel-block:hover {
 .hero.is-info .tabs.is-boxed li.is-active a, .hero.is-info .tabs.is-boxed li.is-active a:hover, .hero.is-info .tabs.is-toggle li.is-active a, .hero.is-info .tabs.is-toggle li.is-active a:hover {
   background-color: white;
   border-color: white;
-  color: #6a9f95;
+  color: #3273dc;
 }
 
 .hero.is-info.is-bold {
-  background-image: -webkit-linear-gradient(309deg, #1577c6 0%, #6a9f95 71%, #4366e5 100%);
-  background-image: linear-gradient(141deg, #1577c6 0%, #6a9f95 71%, #4366e5 100%);
+  background-image: -webkit-linear-gradient(309deg, #1577c6 0%, #3273dc 71%, #4366e5 100%);
+  background-image: linear-gradient(141deg, #1577c6 0%, #3273dc 71%, #4366e5 100%);
 }
 
 @media screen and (max-width: 768px) {
@@ -6703,7 +6497,6 @@ a.panel-block:hover {
   display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
-  color: #0a0a0a;
 }
 
 .hero.is-fullheight .hero-body > .container {
@@ -6712,17 +6505,6 @@ a.panel-block:hover {
           flex-grow: 1;
   -ms-flex-negative: 1;
       flex-shrink: 1;
-}
-
-@keyframes spin-around {
-  from {
-    -webkit-transform: rotate(0deg);
-            transform: rotate(0deg);
-  }
-  to {
-    -webkit-transform: rotate(359deg);
-            transform: rotate(359deg);
-  }
 }
 
 .section {
