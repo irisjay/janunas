@@ -19,6 +19,8 @@ class Component(models.Model):
 	name = models.CharField(max_length=30)
 	order = models.IntegerField()
 	content = models.TextField()
+	files = models.TextField()
+	videos = models.TextField()
 	module = models.ForeignKey(Module)
 
 class Participant(models.Model):
@@ -39,3 +41,7 @@ class User(models.Model):
 	as_participant = models.OneToOneField(Participant, on_delete=models.PROTECT)
 	as_instructor = models.OneToOneField(Instructor, on_delete=models.SET_NULL, null=True, blank=True)
 	as_administrator = models.OneToOneField(Administrator, on_delete=models.SET_NULL, null=True, blank=True)
+
+class HR(models.Model):
+	username = models.CharField(max_length=30, unique=True, validators=[RegexValidator(regex='.', message='You must give a username', code='nomatch')])
+	password = models.CharField(max_length=30)

@@ -249,12 +249,14 @@ def my_course_module_component_new(request, course_id, module_order):
         user_id = request.META['HTTP_X_USER']
         component_name = request.META['HTTP_X_COMPONENT_NAME']
         component_content = request.META['HTTP_X_COMPONENT_CONTENT']
+        component_files = request.META['HTTP_X_COMPONENT_FILES']
+        component_videos = request.META['HTTP_X_COMPONENT_VIDEOS']
         
         user = User.objects.get(id=user_id)
         instructor = user.as_instructor
         course = Course.objects.get(id=course_id,instructor=instructor)
         module = Module.objects.get(order=module_order, course=course)
-        component = Component(name=component_name, order=module.component_set.count(), content=component_content, module=module)
+        component = Component(name=component_name, order=module.component_set.count(), content=component_content, files=component_files, videos=component_videos, module=module)
         component.save()
         
         data = {'order':component.order}
@@ -315,6 +317,8 @@ def my_course_module_component_edit(request, course_id, module_order, component_
         user_id = request.META['HTTP_X_USER']
         component_name = request.META['HTTP_X_COMPONENT_NAME']
         component_content = request.META['HTTP_X_COMPONENT_CONTENT']
+        component_files = request.META['HTTP_X_COMPONENT_FILES']
+        component_videos = request.META['HTTP_X_COMPONENT_VIDEOS']
         
         user = User.objects.get(id=user_id)
         instructor = user.as_instructor
@@ -323,6 +327,8 @@ def my_course_module_component_edit(request, course_id, module_order, component_
         component = Component.objects.get(order=component_order,module=module)
         component.name = component_name
         component.content = component_content
+        component.files = component_files
+        component.videos = component_videos
         component.save()
         
         data = {'edited':True}
@@ -409,6 +415,7 @@ def user_edit(request, his_user_id):
         
 def serialize_course(self, participant):
     return {
+        'id': self.id,
         'name': self.name,
         'description': self.description,
         'published': self.published,
@@ -419,6 +426,7 @@ def serialize_course(self, participant):
     }
 def serialize_module(self, participant):
     return {
+        'id': self.id,
         'name': self.name,
         'done': self.completed_participants.filter(id=participant.id).count(),
         'order': self.order,
@@ -426,10 +434,13 @@ def serialize_module(self, participant):
     }
 def serialize_component(self, participant):
     return {
+        'id': self.id,
         'name': self.name,
         'done': self.completed_participants.filter(id=participant.id).count(),
         'order': self.order,
-        'content': self.content
+        'content': self.content,
+        'files': self.files,
+        'videos': self.videos
     }
 def serialize_user(self):
     return {
@@ -440,3 +451,5 @@ def serialize_user(self):
         'instructor': bool(self.as_instructor),
         'administrator': bool(self.as_administrator)
     }
+    
+    

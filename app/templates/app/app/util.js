@@ -28,110 +28,12 @@ global fetch
 									};
 						};
 	
+var display_errors =	function (event, self) {
+							self .stuff .on (event, function (data) {
+								(data || {}) .error && alert ((data || {}) .error);
+							});
+						};
 				
-				
-									var repeat =	function (times) {
-														return	function (what) {
-																	var array = [];
-																	for (var key = 0; key < times; key ++) {
-																		array .push (what);
-																	};
-																	return array;
-																};
-													};
-									var range =	function (range) {
-													var the_range = [];
-													for (var key = range .from; key <= range .to; key ++) {
-														the_range .push (key);
-													};
-													Object .defineProperty (the_range, 'from', { value: range .from });
-													Object .defineProperty (the_range, 'to', { value: range .to });
-													return the_range;
-												};
-									var spread =	function (amount) {
-														var front_spread = Math .floor (amount / 2);
-														var rear_spread = Math .floor (amount / 2);
-														return	function (position) {
-																	/*var the_spread = [];
-																	for (var key = position .at - front_spread; key <= position .at + rear_spread; key ++) {
-																		the_spread .push (key);
-																	};
-																	Object .defineProperty (the_spread, 'from', { value: position .at - front_spread });
-																	Object .defineProperty (the_spread, 'to', { value: position .at + rear_spread });
-																	Object .defineProperty (the_spread, 'at', { value: position .at });*/
-																	return	{
-																				from: position .at - front_spread,
-																				to: position .at + rear_spread,
-																				at: position .at
-																			};
-																};
-													};
-									var as =	function (key) {
-													return	function (value) {
-																var item = {};
-																item [key] = value;
-																return item;
-															};
-												};
-									var pluck =	function (key) {
-													return	function (item) {
-																return item [key];
-															};
-												};
-									var having =	function (key) {
-														return	function (value) {
-																	return	function (item) {
-																				item [key] = value;
-																				return item;
-																			};
-																};
-													};
-										var if_positive =	function (num) {
-																return (num > 0 ? num : 0);
-															};
-										var count =	function (range) {
-														return range .to - range .from + 1;
-													};
-																	var range_intersection =	function (/*args*/) {
-																									var args = [] .slice .call (arguments);
-																									/*log (range_one, range_two,	{
-																																	from: Math .max (range_one .from, range_two .from),
-																																	to: Math .min (range_one .to, range_two .to)
-																																});*/
-																									
-																									var positions = args
-																														.map (function (range) { return range .at; })
-																														.filter (function (at) { return at != null; });
-																									
-																									var position = 0;
-																									if (positions .length) {
-																										position =	positions
-																														.reduce (function(sum, position) {
-																															return sum + position;
-																														}, 0)
-																													/ positions .length;
-																									}
-																									
-																									//log ('positions', positions, position);
-																									
-																									
-																									return	{
-																												from: Math .max .apply (Math, args .map (pluck ('from'))),
-																												to: Math .min .apply (Math, args .map (pluck ('to'))),
-																												at: Math .floor (position)
-																											};
-																								};
-								var same =	function (place_one, place_two) {
-												return place_one && place_two && place_one ['to'] === place_two ['to'] && place_one ['from'] === place_two ['from'];
-											};
-								var included_in =	function (bigger, smaller) {
-														return same (
-																	range_intersection (bigger, smaller),
-																	smaller);
-													};
-								var position_diff =	function (position_one, position_two) {
-														return Math .abs (position_one .at - position_two .at);
-													};
 									
 			var on_next_tick =	function (action) {
 									requestAnimationFrame (action);
@@ -151,14 +53,9 @@ global fetch
 								};
 								
 
-var display_errors =	function (event, self) {
-							self .stuff .on (event, function (data) {
-								(data || {}) .error && alert ((data || {}) .error);
-							});
-						};
 
 			var tag_name =	function (page_name) {
-								return 'screen-page-' + replace_all ('/', '-') (trim_trailing_slash (page_name));
+								return 'page-' + replace_all ('/', '-') (trim_trailing_slash (page_name));
 							};
 								
 			var page_name =	function (path) {
@@ -169,268 +66,6 @@ var display_errors =	function (event, self) {
 									};
 
 								
-								
-										var diff =	function (to_where, here) {
-
-														var diff =	{
-																		front:	{
-																					from: to_where .from,
-																					to: here .from - 1
-																				},
-																		back:	{
-																					from: here .to + 1,
-																					to: to_where .to
-																				}
-																	};
-																	
-														if ( opposite (diff .front, diff .back) ) {
-															var positive_front = positive (diff .front);
-															var positive_back = positive (diff .back);
-															diff =	//logged ('ex diff',
-																		{
-																			front: add_sign (sign (diff .front)) (minus (positive_front, positive_back)),
-																			back: add_sign (sign (diff .back)) (minus (positive_back, positive_front))
-																		}
-																	/*)*/;
-															//if ( inclusive ) ...
-														}			
-														
-														diff .map = function (mapper) {
-																		var self = this;
-																		return	{
-																					front:	function (array) {
-																								var diff_count = if_positive ( - count (self .front) );
-																								array .splice .apply (
-																									array,
-																									[
-																										0,
-																										diff_count
-																									] .concat (
-																										range (self .front) .map (mapper)
-																									)
-																								);
-																								return array;
-																							},
-																					back:	function (array) {
-																								var diff_count = if_positive ( - count (self .back) );
-																								array .splice .apply (
-																									array,
-																									[
-																										array .length - diff_count,
-																										diff_count
-																									] .concat (
-																										range (self .back) .map (mapper)
-																									)
-																								);
-																								return array;
-																							}
-																				};
-																	};
-														return diff;
-													};
-													
-										var sign = count;
-										var add_sign =	function (sign) {
-															return	function (range) {
-																		if (sign >= 0)
-																			return range;
-																		else
-																			return range_invert (range);
-																	};
-														};
-										var positive =	function (range) {
-															return add_sign (sign (range)) (range);
-														};
-										var opposite =	function (range_one, range_two) {
-															var sign_one = sign (range_one);
-															var sign_two = sign (range_two);
-															return	(sign_one > 0 && sign_two < 0)
-																	|| (sign_one < 0 && sign_two > 0);
-														};
-										var minus =	function (range_one, range_two) {
-														var intersection = range_intersection (range_one, range_two);
-														if (sign (intersection) <= 0)
-															return range_one;
-														else if (intersection .from === range_one .from)
-															return	{
-																		from: intersection . to + 1,
-																		to: range_one .to
-																	};
-														else
-															return	{
-																		from: range_one .from,
-																		to: intersection .from - 1
-																	};
-													};
-													
-										var do_diffs =	function (diff_map, original) {
-															return diff_map .front (diff_map .back (original));
-														};
-														
-										var range_invert =	function (range) {
-																return	{
-																			from: range .to + 1,
-																			to: range .from - 1
-																		};
-															};
-										var range_add =	function (range_one, range_two) {
-															if (range_one .to + 1 === range_two .from)
-																return	{
-																			from: range_one .from,
-																			to: range_two .to
-																		};
-															else
-																throw 'unaddable';
-														};	
-														
-			
-			var throttle =	function (callback, limit) {
-							    var wait = false;                  // Initially, we're not waiting
-							    return	function () {               // We return a throttled function
-									        if (! wait) {                   // If we're not waiting
-									            callback .apply (this, arguments);           // Execute users function
-									            wait = true;               // Prevent future invocations
-									            setTimeout (function () {   // After a period of time
-									                wait = false;          // And allow future invocations
-									            }, limit);
-									        }
-									    }
-							};
-			var adthrottle =	function (callback, limit) {
-									var ad = false;
-								    var wait = false;                  // Initially, we're not waiting
-								    var adthrottled =	function () {               // We return a throttled function
-													        if (! wait) {                   // If we're not waiting
-													            callback .apply (this, arguments);           // Execute users function
-													            wait = true;               // Prevent future invocations
-													            setTimeout (function () {   // After a period of time
-													                wait = false;          // And allow future invocations
-													                if (ad) {
-													                	ad = false;
-													                	adthrottled ();
-													                }
-													            }, limit);
-													        }
-													        else {
-													        	ad = true;
-													        }
-													    };
-									return adthrottled;
-								};
-			var debounce =	function(func, wait, immediate) {
-								var timeout;
-								immediate = immediate ();
-								return	function () {
-											var context = this, args = arguments;
-											var later =	function () {
-															timeout = null;
-															if (! immediate) func.apply(context, args);
-														};
-											var callNow = immediate && ! timeout;
-											clearTimeout (timeout);
-											timeout = setTimeout (later, wait);
-											if (callNow) func .apply (context, args);
-										};
-							};
-			/*var bounce =	function(func, wait) {
-								var timeout;
-								var queue = [];
-								
-								var run_queue =	function () {
-													if (queue .length) {
-														if ( ! timeout ) {
-															var func = queue .shift ();
-															func ();
-															timeout =	setTimeout (function () {
-																			timeout = null;
-																			run_queue ();
-																		}, wait);	
-														}
-													}
-												};
-								
-								return	function () {
-											var context = this, args = arguments;
-											var later =	function () {
-															func .apply (context, args);
-														};
-											queue .push (later);
-											
-											run_queue ();
-										};
-							};*/
-			var prebounce =	function (func, initial_wait, wait) {
-								var timeout =	setTimeout (function () {
-													timeout = null;
-													run_queue ();
-												}, initial_wait);
-								var on_queue = false;
-								
-								var run_queue =	function () {
-													if (on_queue) {
-														if ( ! timeout ) {
-															on_queue = false;
-															func ();
-															timeout =	setTimeout (function () {
-																			timeout = null;
-																			run_queue ();
-																		}, wait);	
-														}
-													}
-												};
-								
-								return	function () {
-											/*var context = this, args = arguments;
-											var later =	function () {
-															func .apply (context, args);
-														};
-											queue .push (later);*/
-											//debugger;
-											on_queue = true;
-											
-											run_queue ();
-										};
-							};//*/
-			
-			var one_at_a_time =	function (get_thing_to_do/* return promise */) {
-									var doing;
-									return	function () {
-												if (! doing) {
-													doing = get_thing_to_do .apply (this, arguments);
-													doing .then (function () {
-														doing = undefined;
-													});
-												}
-											};
-								};
-			
-							
-			var i_promise =	function (what) {
-								return new Promise (what);
-							};
-							
-			var stars_text =	function (how_many_stars) {
-									var text = '';
-									var star = 0;
-									for (; star < how_many_stars; star ++) {
-										text += '\uF2FC';
-									}
-									if (how_many_stars % 1) {
-										text += '\uF3AD';
-										star ++;
-									}
-									for (; star < 5; star ++) {
-										text += '\uF3AE';
-									}
-									return text;
-								};
-								
-								
-								
-			var is_positive_integer =	function (string) {
-										    var n = ~~Number (string);
-										    return String (n) === string && n >= 0;
-										};
 										
 										
 			var without =	function (you) {
@@ -800,9 +435,13 @@ var login_using =	function (secrets) {
 						return secrets;
 					};
 
+if (window .location .protocol !== 'https:') {
+	window .location .replace ('https://' + window .location .hostname + window .location .pathname + window .location .hash);
+}
 
-var frontend_path = 'https://indiniga-mumenrider.c9users.io/app';
-var backend_path = 'https://indiniga-mumenrider.c9users.io/api';
+
+var frontend_path = 'https://' + window .location .hostname + '/app';
+var backend_path =  'https://' + window .location .hostname + '/api';
 				
 				
 var util = {};

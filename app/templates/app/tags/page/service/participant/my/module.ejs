@@ -1,0 +1,56 @@
+<layout-default>
+    
+    <div id="wrap">
+		<div id="content">
+		    <h2 if={ ((assemble (((recalls ('course') || {}) .course || {}) .module_set) || {}) [recalls ('module_order')] || {}) .done }><strike>{ ((assemble (((recalls ('course') || {}) .course || {}) .module_set) || {}) [recalls ('module_order')] || {}) .name }</strike></h2>
+            <h2 if={ ! ((assemble (((recalls ('course') || {}) .course || {}) .module_set) || {}) [recalls ('module_order')] || {}) .done }>{ ((assemble (((recalls ('course') || {}) .course || {}) .module_set) || {}) [recalls ('module_order')] || {}) .name }</h2>
+            
+            <table>
+                <tr><th>Components</th><th></th></tr>
+        		<tr each={ assemble (((assemble (((recalls ('course') || {}) .course || {}) .module_set) || {}) [recalls ('module_order')] || {}) .component_set) }
+        		    ><td
+        		        ><a href="#service/participant/my/component/#{ recalls ('course_id') }/{ recalls ('module_order') }/{ order }" if={ done } ><strike>{ name }</strike></a
+        		        ><a href="#service/participant/my/component/#{ recalls ('course_id') }/{ recalls ('module_order') }/{ order }" if={ ! done } >{ name }</a
+        		    ></td
+        		></tr>
+            </table>
+			
+		<div style="clear: both;"> </div>
+	</div>
+    
+</layout-default>
+
+<script>
+(function (self) {
+    self .stuff .on ('course', function () {
+        self .update ();
+    });
+    self .stuff .on ('course_id', function () {
+        self .update ();
+    });
+    self .stuff .on ('module_order', function () {
+        self .update ();
+    });
+    
+
+    var leak = undefined;
+    
+    self .understands ('input');
+    self .stuff .on ('input', function (course_id, module_order) {
+        content .course (course_id) (self);
+        leak = setInterval (self .recalls .bind (self, 'course'), 300);
+        
+	    display_errors ('course', self);
+	    
+        remembers ({
+            course_id: course_id,
+            module_order: module_order
+        }) (self);
+    });
+    
+    self .on ('unmount', function () {
+        leak && clearInterval (leak);
+    });
+})(this);
+</script>
+

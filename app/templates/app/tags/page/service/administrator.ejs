@@ -1,0 +1,124 @@
+<%
+	var __ =	function (the_function) {
+					var function_source = the_function .toString ();
+					var function_arguments = /^[^(]*\(([^)]*)\)/ .exec (function_source) [1] .replace (/\s/g, '') .split (',');
+					var function_body = /^[^{]*{([^]*)}[^}]*$/ .exec (function_source) [1];
+					return 'new Function (' + function_arguments .concat ([function_body]) .map (JSON .stringify) .join (',') + ')'
+				};
+%>
+
+<layout-default>
+	
+	<head>
+	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+	<title>Administrator Services</title>
+    </head>
+    
+    <body>
+	<div id="wrap">
+	    <h1>
+            Welcome administrator!
+        </h1>
+		<div id="content">
+			<h2 style="margin:20px"> Administrator Services </h2>
+			<p style="margin:20px">Please select your desired action.</p>
+				<table style="margin:20px">
+		<tr><th>All Users</th><th></th><th></th></tr>
+		<tr each={ id, user in piece ((recalls ('all-users') || {}) .users) || {} }
+			riot-script={ (<%- __(function (self, user) {
+				var buttons_work =	function () {
+										util .user_edit (user .id) (self);
+										
+										var make_administrator = self .root .querySelector ('button[to="make_administrator"]');
+										make_administrator && make_administrator .addEventListener ('click', function () {
+											self .stuff .trigger ('edit', {
+												edit_type: 'administrator-add',
+												edit_content: 'add'
+											});
+										}, false);
+										
+										var revoke_administrator = self .root .querySelector ('button[to="revoke_administrator"]');
+										revoke_administrator && revoke_administrator .addEventListener ('click', function () {
+											self .stuff .trigger ('edit', {
+												edit_type: 'administrator-remove',
+												edit_content: 'remove'
+											});
+										}, false);
+										
+										var make_instructor = self .root .querySelector ('button[to="make_instructor"]');
+										make_instructor && make_instructor .addEventListener ('click', function () {
+											self .stuff .trigger ('edit', {
+												edit_type: 'instructor-add',
+												edit_content: 'add'
+											});
+										}, false);
+										
+										var unmake_instructor = self .root .querySelector ('button[to="unmake_instructor"]');
+										unmake_instructor && unmake_instructor .addEventListener ('click', function () {
+											self .stuff .trigger ('edit', {
+												edit_type: 'instructor-remove',
+												edit_content: 'remove'
+											});
+										}, false);
+										
+										var restrict_enrolling = self .root .querySelector ('button[to="restrict_enrolling"]');
+										restrict_enrolling && restrict_enrolling .addEventListener ('click', function () {
+											self .stuff .trigger ('edit', {
+												edit_type: 'restrict-add',
+												edit_content: 'add'
+											});
+										}, false);
+										
+										var unrestrict_enrolling = self .root .querySelector ('button[to="unrestrict_enrolling"]');
+										unrestrict_enrolling && unrestrict_enrolling .addEventListener ('click', function () {
+											self .stuff .trigger ('edit', {
+												edit_type: 'restrict-remove',
+												edit_content: 'remove'
+											});
+										}, false);
+									};
+				self .on ('mount', buttons_work);
+				self .on ('updated', buttons_work);
+			}) %>)(this, user) }
+			><td if={ user .instructor & user .administrator }><mark><strong>{ logged(user) .username }</strong></mark></td
+			><td if={ ! user .instructor & user .administrator }><mark>{ user .username }</mark></td
+			><td if={ user .instructor & ! user .administrator }><strong>{ user .username }</strong></td
+			><td if={ ! user .administrator && ! user .instructor }>{ user .username }</td
+			><td if={ ! user .administrator }><button type="submit" to="make_administrator">Make Admin</button></td
+			><td if={ user .administrator }><button to="revoke_administrator">Revoke Admin</button></td
+			><td if={ ! user .instructor }><button type="submit" to="make_instructor">Make Instructor</button></td
+			><td if={ user .instructor }><button to="unmake_instructor">Unmake Instructor</button></td
+		></tr>
+	</table>
+
+			
+		</div>
+		<div style="clear: both;"> </div>
+	</div>
+</body>
+	
+</layout-default>
+
+<script>
+(function (self) {
+	remembers ({
+		'all-users': undefined
+	});
+	self .stuff .on ('all-users', function () {
+		self .update ();
+		log ('updated');
+	});
+
+    var leak = undefined;
+    
+    content .users (self);
+    leak = setInterval (self .recalls .bind (self, 'all-users'), 300);
+    
+    display_errors ('all-users', self);
+    
+    self .on ('unmount', function () {
+        leak && clearInterval (leak);
+    });
+})(this);
+</script>
+

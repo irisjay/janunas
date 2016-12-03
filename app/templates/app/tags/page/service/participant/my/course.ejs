@@ -1,0 +1,64 @@
+<%
+	var __ =	function (the_function) {
+					var function_source = the_function .toString ();
+					var function_arguments = /^[^(]*\(([^)]*)\)/ .exec (function_source) [1] .replace (/\s/g, '') .split (',');
+					var function_body = /^[^{]*{([^]*)}[^}]*$/ .exec (function_source) [1];
+					return 'new Function (' + function_arguments .concat ([function_body]) .map (JSON .stringify) .join (',') + ')'
+				};
+%>
+
+<layout-default>
+    
+    
+	<div id="wrap">
+		<div id="content">
+		   <h2>{ ((recalls ('course') || {}) .course || {}) .name }</h2>
+            <p>{ ((recalls ('course') || {}) .course || {}) .description }</p>
+            
+            <table>
+                <tr><th>Modules</th></tr>
+        		<tr each={ assemble (((recalls ('course') || {}) .course || {}) .module_set) && assemble (((recalls ('course') || {}) .course || {}) .module_set) .slice (0, assemble (((recalls ('course') || {}) .course || {}) .module_set) .filter (<%- __(function (module) { return module .done }) %>) .length + 1) }
+        		    ><td
+        		        ><a href="#service/participant/my/module/#{ recalls ('course_id') }/{ order }" if={ done }><strike>{ name }</strike></a
+        		        ><a href="#service/participant/my/module/#{ recalls ('course_id') }/{ order }" if={ ! done }>{ name }</a
+        		    ></td
+        		></tr>
+        		<tr if={ assemble (((recalls ('course') || {}) .course || {}) .module_set) && assemble (((recalls ('course') || {}) .course || {}) .module_set) .filter (<%- __(function (module) { return ! module .done }) %>) .length > 1 }><td><i>find out later......</i></td></tr>
+            </table>
+			
+		</div>
+		<div style="clear: both;"> </div>
+	</div>
+    
+    
+</layout-default>
+
+<script>
+(function (self) {
+    self .stuff .on ('course', function () {
+        self .update ();
+    });
+    self .stuff .on ('course_id', function () {
+        self .update ();
+    });
+    
+    var leak = undefined;
+    
+    self .understands ('input');
+    self .stuff .on ('input', function (course_id) {
+        content .course (course_id) (self);
+        leak = setInterval (self .recalls .bind (self, 'course'), 300);
+        
+	    display_errors ('course', self);
+	    
+        remembers ({
+            course_id: course_id
+        }) (self);
+    });
+    
+    self .on ('unmount', function () {
+        leak && clearInterval (leak);
+    });
+})(this);
+</script>
+

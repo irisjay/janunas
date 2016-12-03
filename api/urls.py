@@ -1,5 +1,6 @@
 from django.conf.urls import url
 from . import views
+from revproxy.views import ProxyView
 
 urlpatterns = [
 	url (r'^register$', views.register, name = 'register'),
@@ -21,7 +22,11 @@ urlpatterns = [
 	url (r'^my/course/([^/]+)/module/([^/]+)/component/([^/]+)/edit$', views.my_course_module_component_edit, name = 'my_course_module_component_edit'),
 	url (r'^users$', views.users, name = 'users'),
 	url (r'^user/([^/]+)$', views.user, name = 'user'),
-	url (r'^user/([^/]+)/edit$', views.user_edit, name = 'user_edit')
+	url (r'^user/([^/]+)/edit$', views.user_edit, name = 'user_edit'),
+	
+	
+	
+    url(r'^upload/(?P<path>.*)$', ProxyView.as_view(upstream='https://filebin.net/'))
 ]
 
 '''

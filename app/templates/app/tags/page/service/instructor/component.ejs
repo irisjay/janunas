@@ -1,0 +1,44 @@
+<layout-default>
+    
+    
+	<div id="wrap">
+		<div id="content">
+		    <h2 style="margin:20px">{ ((assemble (((assemble (((recalls ('course') || {}) .course || {}) .module_set) || {}) [recalls ('module_order')] || {}) .component_set) || {}) [recalls ('component_order')] || {}) .name }</h2>
+            <p style="margin:20px">{ ((assemble (((assemble (((recalls ('course') || {}) .course || {}) .module_set) || {}) [recalls ('module_order')] || {}) .component_set) || {}) [recalls ('component_order')] || {}) .content }</p>
+		</div>
+		<div style="clear: both;"> </div>
+	</div>
+    
+</layout-default>
+
+<script>
+(function (self) {
+    self .stuff .on ('course', function () {
+        self .update ();
+    });
+    self .stuff .on ('course_id', function () {
+        self .update ();
+    });
+    self .stuff .on ('module_order', function () {
+        self .update ();
+    });
+    self .stuff .on ('component_order', function () {
+        self .update ();
+    });
+
+    self .understands ('input');
+    self .stuff .on ('input', function (course_id, module_order, component_order) {
+        content .course (course_id) (self);
+        self .recalls ('course');
+        
+	    display_errors ('course', self);
+	    
+        remembers ({
+            course_id: course_id,
+            module_order: module_order,
+            component_order: component_order
+        }) (self);
+    });
+})(this);
+</script>
+

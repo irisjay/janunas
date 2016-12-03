@@ -1,0 +1,76 @@
+<layout-default>
+    
+	<title>Instructor Services</title>
+    
+	<div id="wrap">
+	    <h1>
+            Welcome Instructor!
+        </h1>
+		<div id="content">
+			<h2 style="margin:20px">Instructor Services</h2>
+			<p style="margin:20px">Please select what you desire to do.</p>
+			    <table style="margin:20px">
+                    <tr><th>Courses created by me</th></tr>
+                    <tr each={ (recalls ('my-courses') || {}) .as_instructor }
+                        ><td><a href="#service/instructor/course/#{ id }">{ name }</a></td
+            		    ><td><button to="delete" id={ id }>x</button></td
+            		></tr>
+                </table>
+    
+        <button type="submit" name="add_course" style="margin:20px">
+            Add course
+        </button>
+			
+		</div>
+		<div style="clear: both;"> </div>
+	</div>
+
+</layout-default>
+
+<script>
+(function (self) {
+    self .on ('mount', function () {
+        var add_course = self .root .querySelector ('button[name="add_course"]');
+        
+        add_course .addEventListener ('click', function () {
+            window .location .hash = '#service/instructor/course/add'
+        });
+        
+        [] .forEach .call (self .root .querySelectorAll ('button[to="delete"]'), function (delete_course) {//log('hey');
+            delete_course .addEventListener ('click', function () {//log('hi')
+                var id = delete_course .getAttribute ('id');
+                self .stuff .trigger ('delete', {
+                    course_id: id
+                });
+            }, false);
+        });
+    });
+    self .on ('updated', function () {//log('hoo');
+        [] .forEach .call (self .root .querySelectorAll ('button[to="delete"]'), function (delete_course) {//log('hey');
+            delete_course .addEventListener ('click', function () {//log('hi')
+                var id = delete_course .getAttribute ('id');
+                self .stuff .trigger ('delete', {
+                    course_id: id
+                });
+            }, false);
+        });
+    });
+    
+    self .stuff .on ('my-courses', function () {
+        self .update ();
+    });
+    
+    var leak = undefined;
+    
+    content .my_courses (self);
+    leak = setInterval (self .recalls .bind (self, 'my-courses'), 300);
+    util .course_delete (self);
+	
+	display_errors ('my-courses', self);
+    display_errors ('delete', self);
+	
+    self .on ('unmount', function () {
+        leak && clearInterval (leak);
+    });
+})(this);
+</script>

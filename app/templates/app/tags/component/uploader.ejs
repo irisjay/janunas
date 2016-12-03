@@ -1,0 +1,48 @@
+<input ref="uploader" type='file' multiple>
+
+<script>
+(function (self) {
+    var uploader = self .refs .uploader;
+    uploader .addEventListener ('change', function () {
+        var files = uploader .files;
+        files .forEach (function (file) {
+            upload (file);
+        });
+    });
+    
+    
+    
+    
+    var bin = opts .destination;
+    var url = backend_path + '/upload/';
+    //var binURL = 'https:\/\/filebin.net/' + bin;
+    var upload =    function (file) {
+                        var read_file = new Promise (function (resolve) {
+                                            var reader = new FileReader ();
+                                            reader .onload = function (e) { resolve (e .currentTarget .result); };
+                                            reader .readAsText (file);
+                                        });
+                        
+                        read_file .then (function (file_content) {
+                            console .log ('uploading ' + file .name);
+                            if (! file_content)
+                                throw 'Cannot upload empty file';
+                            return  fetch (url, {
+                                method: 'POST',
+                                headers:    {
+                                                'Cache-Control': 'no-cache',
+                                                'X-Requested-With': 'XMLHttpRequest',
+                                                'Filename': file .name .replace (/[^A-Za-z0-9-_=,.]/g, '_'),
+                                                'Size': file .size,
+                                                'Bin': bin
+                                            },
+                                body: file_content
+                            });
+                        }) .then (function (result) {
+                            console .log ('done ' + file .name, result);
+                        }) .catch (function (error) {
+                            console .error ('failed ' + file .name, error);
+                        });
+                    };
+})(this);
+</script>

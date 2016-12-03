@@ -1,0 +1,88 @@
+<layout-default>
+    
+    <div id="wrap">
+		<div id="content">
+		    <h2 style="margin:20px">{ ((assemble (((recalls ('course') || {}) .course || {}) .module_set) || {}) [recalls ('module_order')] || {}) .name }</h2>
+    
+            <table style="margin:20px">
+                <tr><th>Components</th><th></th></tr>
+        		<tr each={ assemble (((assemble (((recalls ('course') || {}) .course || {}) .module_set) || {}) [recalls ('module_order')] || {}) .component_set) }
+        		    ><td><a href="#service/instructor/component/#{ recalls ('course_id') }/{ recalls ('module_order') }/{ order }">{ name }</a></td
+        		    ><td><button to="delete" order={ order }>x</button></td
+        		    ><td><button to="shift" order={ order }>shift</button></td
+        		></tr>
+            </table>
+            
+            <button type="submit" name="add_component" style="margin:20px">
+                Add component
+            </button>
+		</div>
+		<div style="clear: both;"> </div>
+	</div>
+
+</layout-default>
+
+<script>
+(function (self) {
+    self .on ('mount', function () {
+        var add_component = self .root .querySelector ('button[name="add_component"]');
+        
+        add_component .addEventListener ('click', function () {
+            window .location .hash = '#service/instructor/component/add/#' + self .recalls ('course_id') + '/' + self .recalls ('module_order')
+        });
+    });
+    self .on ('updated', function () {
+        [] .forEach .call (self .root .querySelectorAll ('button[to="delete"]'), function (delete_component) {
+            delete_component .addEventListener ('click', function () {
+                var order = delete_component .getAttribute ('order');
+                self .stuff .trigger ('delete', {
+                    component_order: +order
+                });
+            }, false);
+        });
+        [] .forEach .call (self .root .querySelectorAll ('button[to="shift"]'), function (shift_component) {
+            shift_component .addEventListener ('click', function () {
+                var order = shift_component .getAttribute ('order');
+                self .stuff .trigger ('reorder', {
+                    component_1_order: +order,
+                    component_2_order: (+order + 1) % assemble (((assemble (((self .recalls ('course') || {}) .course || {}) .module_set) || {}) [self .recalls ('module_order')] || {}) .component_set) .length
+                });
+            }, false);
+        });
+    });
+    
+    self .stuff .on ('course', function () {
+        self .update ();
+    });
+    self .stuff .on ('course_id', function () {
+        self .update ();
+    });
+    self .stuff .on ('module_order', function () {
+        self .update ();
+    });
+    
+    var leak = undefined;
+    
+    self .understands ('input');
+    self .stuff .on ('input', function (course_id, module_order) {
+        content .course (course_id) (self);
+        leak = setInterval (self .recalls .bind (self, 'course'), 300);
+        util .component_delete (course_id, module_order) (self);
+        util .component_reorder (course_id, module_order) (self);
+        
+	    display_errors ('course', self);
+	    display_errors ('delete', self);
+	    display_errors ('reorder', self);
+	    
+        remembers ({
+            course_id: course_id,
+            module_order: module_order
+        }) (self);
+    });
+    
+    self .on ('unmount', function () {
+        leak && clearInterval (leak);
+    });
+})(this);
+</script>
+

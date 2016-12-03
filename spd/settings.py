@@ -119,18 +119,11 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
-INSTALLED_APPS = [
-	'django.contrib.admin',
-	'django.contrib.auth',
-	'django.contrib.contenttypes',
-	'django.contrib.sessions',
-	'django.contrib.messages',
-	'django.contrib.staticfiles',
-	]
 	
 INSTALLED_APPS = [
 	'api.apps.ApiConfig',
 	'app.apps.SPDAppConfig',
+    'revproxy',
 	'django.contrib.admin',
 	'django.contrib.auth',
 	'django.contrib.contenttypes',
