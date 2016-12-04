@@ -29,20 +29,20 @@ var scope = function (args) {
 						self .parent (args .parent);
 					
 					
-					//do i need to add lifestyle (sth) here to prevent memory leak?
-					self .connect =	function (what, pathway) {
-										var incoming_memories = most .fromEvent (what, self .__incoming_memory);
-										self .__memory_pathway [what] = pathway (incoming_memories);
-										self .__memory_pathway [what] .observe (function (how_it_really_is) {
-											self.__outgoing_knowledge .trigger (what, how_it_really_is);
-										});
-										if ((pathway .filter || {}) .__incoming_memory_filter)
-											self .__incoming_memory_filter [what] = pathway .filter .__incoming_memory_filter;
-										if ((pathway .filter || {}) .__outgoing_memory_filter)
-											self .__outgoing_memory_filter [what] = pathway .filter .__outgoing_memory_filter;
-									};
+					//do i need to add lifecycle (sth) here to prevent memory leak? prolly not
+					self .connects =	function (what, pathway) {
+											var incoming_memories = most .fromEvent (what, self .__incoming_memory);
+											self .__memory_pathway [what] = pathway (incoming_memories);
+											self .__memory_pathway [what] .observe (function (how_it_really_is) {
+												self.__outgoing_knowledge .trigger (what, how_it_really_is);
+											});
+											if ((pathway .filter || {}) .__incoming_memory_filter)
+												self .__incoming_memory_filter [what] = pathway .filter .__incoming_memory_filter;
+											if ((pathway .filter || {}) .__outgoing_memory_filter)
+												self .__outgoing_memory_filter [what] = pathway .filter .__outgoing_memory_filter;
+										};
 					self .remembers =	function (what) {
-											self .connect (what, function (incoming_memories) {
+											self .connects (what, function (incoming_memories) {
 												return incoming_memories;
 											});
 										};
@@ -70,7 +70,7 @@ var scope = function (args) {
 										}
 									};
     				if (args .extend) {
-    					args .extend .connect = self .connect;
+    					args .extend .connects = self .connects;
     					args .extend .remembers = self .remembers;
     					args .extend .recalls = self .recalls;
     					args .extend .emit = self .emit;

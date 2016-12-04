@@ -148,7 +148,7 @@ def my_course_new(request):
         
         user = User.objects.get(id=user_id)
         instructor = user.as_instructor
-        course = Course(name=course_name, description=course_description, category=Category.objects.get(name=course_category))
+        course = Course(name=course_name, instructordescription=course_description, category=Category.objects.get(name=course_category))
         course.save()
         course.instructor.add(instructor)
         course.save()

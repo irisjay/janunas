@@ -1,9 +1,53 @@
 <layout-default>
 	
-	<div id="wrap">
-		<div id="content">
-			<h2>Components</h2>
-				<h2 if={
+	<h1 class="title">Components</h1>
+	<h2 class="subtitle1" if={
+				value (my ('component_order'), '.done' ) (
+					assemble (
+						value (my ('module_order'), '.component_set') (
+							assemble (my ('course', '.course .module_set'))
+						)
+					)
+				)
+		} ><strike>{ 
+				value (my ('component_order'), '.name' ) (
+					assemble (
+						value (my ('module_order'), '.component_set') (
+							assemble (my ('course', '.course .module_set'))
+						)
+					)
+				)
+		}</strike
+	></h2>
+	<h2 class="subtitle1" if={
+				! value (my ('component_order'), '.done' ) (
+					assemble (
+						value (my ('module_order'), '.component_set') (
+							assemble (my ('course', '.course .module_set'))
+						)
+					)
+				)
+		 } >{
+		 		
+				value (my ('component_order'), '.name' ) (
+					assemble (
+						value (my ('module_order'), '.component_set') (
+							assemble (my ('course', '.course .module_set'))
+						)
+					)
+				)
+	}</h2>
+	<p>{
+				value (my ('component_order'), '.content' ) (
+					assemble (
+						value (my ('module_order'), '.component_set') (
+							assemble (my ('course', '.course .module_set'))
+						)
+					)
+				)
+	}</p>
+	
+	<button class="localbutton button is-outlined is-info" disabled if={
 							value (my ('component_order'), '.done' ) (
 								assemble (
 									value (my ('module_order'), '.component_set') (
@@ -11,126 +55,78 @@
 									)
 								)
 							)
-					} ><strike>{ 
-							value (my ('component_order'), '.name' ) (
-								assemble (
-									value (my ('module_order'), '.component_set') (
-										assemble (my ('course', '.course .module_set'))
-									)
-								)
-							)
-					}</strike
-				></h2>
-				<h2 if={
-							! value (my ('component_order'), '.done' ) (
-								assemble (
-									value (my ('module_order'), '.component_set') (
-										assemble (my ('course', '.course .module_set'))
-									)
-								)
-							)
-					 } >{
-					 		
-							value (my ('component_order'), '.name' ) (
-								assemble (
-									value (my ('module_order'), '.component_set') (
-										assemble (my ('course', '.course .module_set'))
-									)
-								)
-							)
-				}</h2>
-				<p>{
-							value (my ('component_order'), '.content' ) (
-								assemble (
-									value (my ('module_order'), '.component_set') (
-										assemble (my ('course', '.course .module_set'))
-									)
-								)
-							)
-				}</p>
-				
-				<button disabled if={
-										value (my ('component_order'), '.done' ) (
-											assemble (
-												value (my ('module_order'), '.component_set') (
-													assemble (my ('course', '.course .module_set'))
-												)
-											)
-										)
-					} >
-					Already done
-				</button>
-				<button type="submit" if={
-																	! value (my ('component_order'), '.done' ) (
-																		assemble (
-																			value (my ('module_order'), '.component_set') (
-																				assemble (my ('course', '.course .module_set'))
-																			)
-																		)
-																	)
-					} <%- ref ('done_component') %> >
-					I am done
-				</button>    
-			
-		</div>
-		<div style="clear: both;"> </div>
-	</div>
+		} >
+		Already done
+	</button>
+	<button class="localbutton button is-outlined is-info" type="submit" if={
+														! value (my ('component_order'), '.done' ) (
+															assemble (
+																value (my ('module_order'), '.component_set') (
+																	assemble (my ('course', '.course .module_set'))
+																)
+															)
+														)
+		} <%- ref ('done_component') %> >
+		I am done
+	</button>    
+
 	
 </layout-default>
 
 <script>
-(function (self) {		
-	remembers ({
-		course: undefined,
-		module_order: undefined,
-		component_order: undefined
-	}) (self);
-
-
-	connects ({
-		done_component:	each_ref ('done_component')
-	}) (self);
-
-
-
-
-	remembers ({
-		input:	function (args) {
-					var course_id = args [0];
-					var module_order = args [1];
-					var component_order = args [2];
+	(function (self) {		
+		remembers ({
+			course: undefined,
+			module_order: undefined,
+			component_order: undefined
+		}) (self);
+			
 					
-					
-					most .periodic (500)
-						.thru (content .course (course_id))
-						.tap (display_errors)
-						.observe (function (course) {
-							self .emit ('course', course)
-						});
-					remembers ({
-						module_order: module_order,
-						component_order: component_order
-					}) (self);
-					
-							
-					most .mergeArray ([
-						most .fromEvent ('course', self),
-						most .fromEvent ('module_order', self),
-						most .fromEvent ('component_order', self)
-					])
+		most .mergeArray ([
+			most .fromEvent ('course', self),
+			most .fromEvent ('module_order', self),
+			most .fromEvent ('component_order', self)
+		])
+		.tap (display_errors)
+		.observe (function () {
+			self .update ();
+		});
+	
+	
+		connects ({
+			done_component:	each_ref ('done_component')
+		}) (self);
+	
+	
+	
+	
+		self .remembers ('input');
+		self .on ('input', function (args) {
+			var course_id = args [0];
+			var module_order = args [1];
+			var component_order = args [2];
+			
+			
+			most .periodic (50000)
+				.until (lifecycle (self))
+				.thru (content .course (course_id))
+				.tap (display_errors)
+				.observe (function (course) {
+					self .emit ('course', course)
+				});
+			
+			
+			self .emit ('module_order', module_order);
+			self .emit ('component_order', component_order);
+			
+			
+			self .on ('done_component',	function (done_component) {
+				most .fromEvent ('click', done_component)
+					.thru (util .component_done (course_id, module_order, component_order))
 					.tap (display_errors)
-					.observe (function () {
-						self .update ();
-					});
-					
-					
-					self .on ('done_component',	function (done_component) {
-						most .fromEvent ('click', done_component)
-							.thru (util .component_done (course_id, module_order, component_order))
-							.observe (display_errors);
-					});
-				}
-	}) (self);
+					.observe (rehash);
+			});
+		});
 })(this);
 </script>
 

@@ -1,54 +1,41 @@
 <layout-default>
 	
-	<div id="wrap">
-		<div id="content">
-			<h2>Add Component</h2>
-			<label style="margin:20px">Component name: </label><br/>
-			<input type="text" style="width:400px; margin:20px" <%- ref ('component_name') %> >
-			<br/><br/>
-			<label style="margin:20px">Component content: </label><br/>
-			<textarea rows="3" style="width:400px; margin:20px" <%- ref ('component_content') %> />
-			<br/>
-			<button type="submit" style="margin:20px" <%- ref ('add_component') %> >
-				Add component
-			</button>
-		</div>
-		<div style="clear: both;"> </div>
-	</div>
+	<h1 class="title">Add Component</h1>
+	<label>Component name: </label><br/>
+	<input type="text" style="width:400px; margin:20px" x="component_name" >
+	<br/><br/>
+	<label>Component content: </label><br/>
+	<textarea rows="3" style="width:400px; margin:20px" x="component_content" />
+	<br/>
+	<button type="submit" class="localbutton button is-outlined is-info" onclick={ emit.bind(self,'add') } >
+		Add component
+	</button>
 	
 </layout-default>
 
 <script>
 	(function (self) {
-		connects ({
-			component_name: each_ref ('component_name'),
-			component_content: each_ref ('component_content'),
-			add_component: each_ref ('add_component')
-		}) (self);
-		
-		remembers ({
-			input:	function (args) {
-						var course_id = args [0];
-						var module_order = args [1];
-						
-						self .on ('add_component', function (add_component) {
-							most .fromEvent ('click', add_component)
-								.map (function () {
-									return	{
-												component_name: component_name .value,
-												component_content: component_content .value
-											};
-								})
-								.thru (util .component_new (course_id, module_order))
-								.tap (display_errors)
-								.observe (function (response) {
-									if (! response .error) {
-										//alert ('Component added')
-										window .location .hash = '#service/instructor/module/#' + course_id + '/' + module_order
-									}
-								});
-						});
+		self .remembers ('input');
+		self .on ('input', function (args) {
+			var course_id = args [0];
+			var module_order = args [1];
+			
+			self .remembers ('add')
+			self .on ('add', function () {
+				most .just ({
+					component_name: self .root .querySelector ('[x="component_name"]') .value,
+					component_content: self .root .querySelector ('[x="component_content"]') .value,
+					component_files: JSON.stringify([]),
+					component_videos: JSON.stringify([])
+				}) .thru (util .component_new (course_id, module_order))
+				.tap (display_errors)
+				.observe (function (response) {
+					if (! response .error) {
+						//alert ('Component added')
+						window .location .hash = '#service/instructor/module/#' + course_id + '/' + module_order
 					}
+				});
+			});
 		});
 		
 		/*

@@ -1,22 +1,22 @@
 <p class="control has-addons has-addons-centered">
-    <input type="text" placeholder="Username" <%- ref ('username') %>>
+    <input type="text" placeholder="Username" <%- ref ('__username') %>>
 </p>
 <p class="control has-addons has-addons-centered">
-    <input type="password" placeholder="Password" <%- ref ('password') %>>
+    <input type="password" placeholder="Password" <%- ref ('__password') %>>
 </p>
 
 <script>
     (function (self) {
         connects ({
-            username: each_ref ('username'),
-            password: each_ref ('password')
+            __username: each_ref ('__username'),
+            __password: each_ref ('__password')
         }) (self);
-        self .on ('username', function (username) {
+        self .on ('__username', function (username) {
             username .addEventListener ('input', function () {
                 self .emit (opts .username__from, username .value);
             });
         });
-        self .on ('password', function (password) {
+        self .on ('__password', function (password) {
             password .addEventListener ('input', function () {
                 self .emit (opts .password__from, password .value);
             });

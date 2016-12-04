@@ -3,8 +3,12 @@ from django.core.validators import RegexValidator
 
 from django.db import models
 	
+class Category(models.Model):
+	name = models.CharField(max_length=30, unique=True)
+	
 class Course(models.Model):
 	name = models.CharField(max_length=30, unique=True)
+	category = models.ForeignKey(Category, on_delete=models.PROTECT)
 	published = models.BooleanField(default=False)
 	description = models.TextField()
 	instructor = models.ManyToManyField('Instructor')

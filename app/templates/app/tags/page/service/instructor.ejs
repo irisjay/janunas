@@ -1,35 +1,29 @@
 <layout-default>
 	
-	<title>Instructor Services</title>
-	
-	<div id="wrap">
-		<h1>
-			Welcome Instructor!
-		</h1>
-		<div id="content">
-			<h2 style="margin:20px">Instructor Services</h2>
-			<p style="margin:20px">Please select what you desire to do.</p>
-				<table style="margin:20px">
-					<tr><th>Courses created by me</th></tr>
-					<tr each={ my ('my_courses', '.as_instructor') }
-						><td><a href="#service/instructor/course/#{ id }">{ name }</a></td
-						><td><button course={ id } <%- ref ('delete_course') %> >x</button></td
-					></tr>
-				</table>
-	
-		<button type="submit" style="margin:20px" <%- ref ('add_course') %> >
-			Add course
-		</button>
-			
-		</div>
-		<div style="clear: both;"> </div>
-	</div>
+
+	<h1 class="title">Instructor Services</h1>
+		<img class="instructor-image" 
+		src="http://3.bp.blogspot.com/-huiOhtTMGes/VNPH7A_vVNI/AAAAAAAAFf0/-6LwfESemFY/s1600/linklab-graphic.png"
+		"Improve the knowledge of your fellow employees!">
+	<h2 class="subtitle1">Please select what you desire to do.</h2>
+		<table class="table">
+			<tr><th>Courses created by me</th><th/><th/></th></tr>
+			<tr each={ my ('my_courses', '.as_instructor') }
+				><td><a href="#service/instructor/course/#{ id }">{ name }</a></td
+				><td><button class="localbutton button is-outlined is-info" course={ id } <%- ref ('delete_course') %> >x</button></td
+				></tr>
+		</table>
+
+	<button class="localbutton button is-outlined is-info is-large" type="submit" style="margin:20px" <%- ref ('add_course') %> >
+		Add course
+	</button>
 
 </layout-default>
 
 <script>
 (function (self) {
 	most .periodic (500)
+        .until (lifecycle (self))
 		.thru (content .my_courses)
 		.tap (display_errors)
 		.observe (function (my_courses) {
@@ -59,7 +53,7 @@
 		most .fromEvent ('click', delete_course)
 			.map (function () {//log('hi')
 				return	{
-							course_id: id
+							course_id: course_id
 						};
 			})
 			.thru (util .course_delete)
@@ -67,3 +61,24 @@
 	})
 })(this);
 </script>
+
+<style>
+	:scope .localbutton {
+        color: <%- company_color%> !important;
+        border-color: <%- company_color%> !important;
+        border-radius: 0px 0px 0px 0px !important;
+        display: inline;
+    }
+    
+    :scope .localbutton:hover {
+        color: #ffffff !important;
+        background: <%- company_color%> !important;
+    }
+    
+    :scope .instructor-image {
+    	height: 300px;
+    	position: relative;
+    	left: 30%;
+    	text-align: center;
+    }
+</style>

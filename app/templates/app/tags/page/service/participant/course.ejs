@@ -1,35 +1,21 @@
 <layout-default>
     
-    <body>
-	<div id="wrap">
-	    <h1>
-            Welcome Participant!
-        </h1>
-		<div id="content">
-			<h2>View Course</h2>
-             <h3 if={ (piece (((get_cache (backend_path + '/my/courses') || {}) .as_participant || {}) .enrolled_courses) || {}) [recalls ('course_id') || ''] }><mark>{ ((recalls ('course') || {}) .course || {}) .name }</mark></h3>
-                <h3 if={ ! (piece (((get_cache (backend_path + '/my/courses') || {}) .as_participant || {}) .enrolled_courses) || {}) [recalls ('course_id') || ''] && (piece (((get_cache (backend_path + '/my/courses') || {}) .as_participant || {}) .completed_courses) || {}) [recalls ('course_id') || ''] }><strike>{ ((recalls ('course') || {}) .course || {}) .name }</strike></h3>
-                <h3 if={ ! (piece (((get_cache (backend_path + '/my/courses') || {}) .as_participant || {}) .enrolled_courses) || {}) [recalls ('course_id') || ''] && ! (piece (((get_cache (backend_path + '/my/courses') || {}) .as_participant || {}) .completed_courses) || {}) [recalls ('course_id') || ''] }>{ ((recalls ('course') || {}) .course || {}) .name }</h3>
-                <p>{ ((recalls ('course') || {}) .course || {}) .description }</p>
-                
-                <button disabled if={ (piece (((get_cache (backend_path + '/my/courses') || {}) .as_participant || {}) .enrolled_courses) || {}) [recalls ('course_id') || ''] }>
-                    You are already enrolled in this course
-                </button>
-                <button disabled if={ (get_cache (backend_path + '/login') || {}) .enroll_restricted && Object .keys (piece (((get_cache (backend_path + '/my/courses') || {}) .as_participant || {}) .enrolled_courses) || {}) .length }>
-                    You are restricted to take one course at a time
-                </button>
-                <button type="submit" name="enroll_course" if={ ! logged_with('enrolled?')(logged_with('enrolled courses')(piece (((get_cache (backend_path + '/my/courses') || {}) .as_participant || {}) .enrolled_courses) || {}) [recalls ('course_id') || '']) && logged_with('unrestricted')( ! (get_cache (backend_path + '/login') || {}) .enroll_restricted || ! Object .keys (piece (((get_cache (backend_path + '/my/courses') || {}) .as_participant || {}) .enrolled_courses) || {}) .length ) }>
-                    Enroll!
-                </button>
-			
-		</div>
-		<div id="sidebar">
-			<h3>User Information</h3>
-			<ul></ul>
-		</div>
-		<div style="clear: both;"> </div>
-	</div>
-</body>
+    <h1 class="title">View Course</h1>
+    <h2 class="subtitle1" if={ (piece (((get_cache (backend_path + '/my/courses') || {}) .as_participant || {}) .enrolled_courses) || {}) [recalls ('course_id') || ''] }><mark>{ ((recalls ('course') || {}) .course || {}) .name }</mark></h2>
+        <h2 class="subtitle1" if={ ! (piece (((get_cache (backend_path + '/my/courses') || {}) .as_participant || {}) .enrolled_courses) || {}) [recalls ('course_id') || ''] && (piece (((get_cache (backend_path + '/my/courses') || {}) .as_participant || {}) .completed_courses) || {}) [recalls ('course_id') || ''] }><strike>{ ((recalls ('course') || {}) .course || {}) .name }</strike></h2>
+        <h2 class="subtitle1" if={ ! (piece (((get_cache (backend_path + '/my/courses') || {}) .as_participant || {}) .enrolled_courses) || {}) [recalls ('course_id') || ''] && ! (piece (((get_cache (backend_path + '/my/courses') || {}) .as_participant || {}) .completed_courses) || {}) [recalls ('course_id') || ''] }>{ ((recalls ('course') || {}) .course || {}) .name }</h2>
+        <p>{ ((recalls ('course') || {}) .course || {}) .description }</p>
+        
+        <button class="localbutton button is-outlined is-info" disabled if={ (piece (((get_cache (backend_path + '/my/courses') || {}) .as_participant || {}) .enrolled_courses) || {}) [recalls ('course_id') || ''] }>
+            You are already enrolled in this course
+        </button>
+        <button class="localbutton button is-outlined is-info" disabled if={ (get_cache (backend_path + '/login') || {}) .enroll_restricted && Object .keys (piece (((get_cache (backend_path + '/my/courses') || {}) .as_participant || {}) .enrolled_courses) || {}) .length }>
+            You are restricted to take one course at a time
+        </button>
+        <button class="localbutton button is-outlined is-info" type="submit" name="enroll_course" if={ ! logged_with('enrolled?')(logged_with('enrolled courses')(piece (((get_cache (backend_path + '/my/courses') || {}) .as_participant || {}) .enrolled_courses) || {}) [recalls ('course_id') || '']) && logged_with('unrestricted')( ! (get_cache (backend_path + '/login') || {}) .enroll_restricted || ! Object .keys (piece (((get_cache (backend_path + '/my/courses') || {}) .as_participant || {}) .enrolled_courses) || {}) .length ) }>
+            Enroll
+        </button>
+
     
 </layout-default>
 
@@ -39,37 +25,38 @@
         var enroll_course = self .root .querySelector ('button[name="enroll_course"]');
         
         enroll_course && enroll_course .addEventListener ('click', function () {
-            self .stuff .one ('enroll', function () {
+            self .one ('enroll', function () {
                 window .location .hash = '#service/participant'
             });
-            self .stuff .trigger ('enroll');
+            self .emit ('enroll');
         }, false);
     });
     self .on ('updated', function () {
         var enroll_course = self .root .querySelector ('button[name="enroll_course"]');
         
         enroll_course && enroll_course .addEventListener ('click', function () {
-            self .stuff .one ('enroll', function () {
+            self .one ('enroll', function () {
                 window .location .hash = '#service/participant'
             });
-            self .stuff .trigger ('enroll');
+            self .emit ('enroll');
         }, false);
     });
     
-    self .stuff .on ('course', function () {
+    self .on ('course', function () {
         self .update ();
     });
-    self .stuff .on ('course_id', function () {
+    self .on ('course_id', function () {
         self .update ();
     });
     
 
-    self .understands ('input');
-    self .stuff .on ('input', function (course_id) {
-        content .course (course_id) (self);
-        util .course_enroll (course_id) (self);
+    self .remembers ('input');
+    self .on ('input', function (course_id) {
         
-	    display_errors ('course', self);
+        connects ({
+            course: content .course (course_id),
+            enroll: util .course_enroll (course_id)
+        }) (self);
 	    
         remembers ({
             course_id: course_id

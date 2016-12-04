@@ -1,64 +1,61 @@
 <layout-default>
 	
+	<h1 class="title">{ my ('course', '.course .name') }</h1>
+	<h2 class="subtitle1">{ my ('course', '.course .description') }</h2>
 	
-	<div id="wrap">
-		<div id="content">
-		   <h2>{ my ('course', '.course .name') }</h2>
-			<p>{ my ('course', '.course .description') }</p>
-			
-			<table>
-				<tr><th>Modules</th></tr>
-				<tr each={
-							assemble (
-								my ('course', '.course .module_set')
-								&& assemble (my ('course', '.course .module_set'))
-									.slice (0, assemble (my ('course', '.course .module_set')) .filter (<%- __(function (module) { return module .done }) %>) .length + 1)
-							)
-				}><td
-						><a href="#service/participant/my/module/#{ my ('course_id') }/{ order }" if={ done }><strike>{ name }</strike></a
-						><a href="#service/participant/my/module/#{ my ('course_id') }/{ order }" if={ ! done }>{ name }</a
-					></td
-				></tr>
-				<tr if={
-							assemble (my ('course', '.course .module_set'))
-							&& assemble (my ('course', '.course .module_set')) .filter (<%- __(function (module) { return ! module .done }) %>) .length > 1
-				}><td><i>find out later......</i></td></tr>
-			</table>
-			
-		</div>
-		<div style="clear: both;"> </div>
-	</div>
-	
+	<table class="table">
+		<tr><th>Modules</th></tr>
+		<tr each={
+					assemble (
+						my ('course', '.course .module_set')
+						&& assemble (my ('course', '.course .module_set'))
+							.slice (0, assemble (my ('course', '.course .module_set')) .filter (has_done) .length + 1)
+					)
+		}><td
+				><a href="#service/participant/my/module/#{ my ('course_id') }/{ order }" if={ done }><strike>{ name }</strike></a
+				><a href="#service/participant/my/module/#{ my ('course_id') }/{ order }" if={ ! done }>{ name }</a
+			></td
+		></tr>
+		<tr if={
+					assemble (my ('course', '.course .module_set'))
+					&& (1 < assemble (my ('course', '.course .module_set')) .filter (has_not_done) .length)
+		}><td><i>find out later......</i></td></tr>
+	</table>
 	
 </layout-default>
 
 <script>
-(function (self) {
-	remembers ({
-		course: undefined
-	}) (self);
-	most .fromEvent ('course', self)
-		.observe (function () {
+	(function (self) {
+		remembers ({
+			course: undefined,
+			course_id: undefined
+		}) (self);
+		most .mergeArray ([
+			most .fromEvent ('course', self),
+			most .fromEvent ('course_id', self),
+		]) .observe (function () {
 			self .update ();
 		});
-	
-	
-	
-	
-	remembers ({
-		input:	function (args) {
-					var course_id = args [0];
-					
-					
-					most .periodic (500)
-						.thru (content .course (course_id))
-						.tap (display_errors)
-						.observe (function (course) {
-							self .emit ('course', course)
-						});
-				}
-	});
-	
-})(this);
+		
+		
+		
+		
+		self .remembers ('input');
+		self .on ('input', function (args) {
+			var course_id = args [0];
+			
+			
+			most .periodic (500)
+				.until (lifecycle (self))
+				.thru (content .course (course_id))
+				.tap (display_errors)
+				.observe (function (course) {
+					self .emit ('course', course)
+				});
+				
+				
+			self .emit ('course_id', course_id);
+		});
+	}) (this);
 </script>
 

@@ -258,7 +258,7 @@ util .component_done =	function (course_id, module_order, component_order) {
 util .course_new =	writer (backend_path + '/my/course/new', {
 						write:	{
 									method: 'GET',
-									headers: '{ with_ ("x-course-name", data .course_name) (with_ ("x-course-description", data .course_description) (logged_in_header ())) }'
+									headers: '{ with_ ("x-course-category", data .course_category) (with_ ("x-course-name", data .course_name) (with_ ("x-course-description", data .course_description) (logged_in_header ()))) }'
 								}
 					}, '{ response }');
 util .course_delete =	writer (backend_path + '/my/course/delete', {
@@ -303,7 +303,7 @@ util .component_new =	function (course_id, module_order) {
 							return	writer (backend_path + '/my/course/' + course_id + '/module/' + module_order + '/component/new', {
 										write:	{
 													method: 'GET',
-													headers: '{ with_ ("x-component-name", data .component_name) (with_ ("x-component-content", data .component_content) (logged_in_header ())) }'
+													headers: '{ with_ ("x-component-videos", data .component_videos) (with_ ("x-component-files", data .component_files) (with_ ("x-component-name", data .component_name) (with_ ("x-component-content", data .component_content) (logged_in_header ())))) }'
 												}
 									}, '{ response }');
 						};	
@@ -327,7 +327,7 @@ util .component_edit =	function (course_id, module_order, component_order) {
 							return	writer (backend_path + '/my/course/' + course_id + '/module/' + module_order + '/component/' + component_order + '/edit', {
 										write:	{
 													method: 'GET',
-													headers: '{ with_ ("x-component-name", data .component_name) (with_ ("x-component-content", data .component_content) (logged_in_header ())) }'
+													headers: '{ with_ ("x-component-videos", data .component_videos) (with_ ("x-component-files", data .component_files) (with_ ("x-component-name", data .component_name) (with_ ("x-component-content", data .component_content) (logged_in_header ())))) }'
 												}
 									}, '{ response }');
 						};	

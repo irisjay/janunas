@@ -1,40 +1,32 @@
 <layout-default>
     
-	<title>Participant Services</title>
+	<h1 class="title">Participant Services</h1>
+	
+	<img class="participant-image" src="https://cdn4.iconfinder.com/data/icons/proglyphs-science-and-medicine/512/Education-512.png" alt="Let's get learning!">
     
-	<div id="wrap">
-	    <h1>
-            Welcome Participant!
-        </h1>
-		<div id="content">
-			<h2 style="margin:20px">Participant Services</h2>
-			<p style="margin:20px">Please select what you desire to do.</p>
-			        <table style="margin:20px">
-                        <tr><th>Courses I am enrolled in</th></tr>
-                        <tr each={ my ('my_courses', '.as_participant .enrolled_courses') }
-                            ><td><a href="#service/participant/my/course/#{ id }"><mark>{ name }</mark></a></td
-                        ></tr>
-                    </table>
-                    
-                    <table style="margin:20px">
-                        <tr><th>Courses I have completed</th></tr>
-                        <tr each={ my ('my_courses', '.as_participant .completed_courses') }
-                            ><td><a href="#service/participant/my/course/#{ id }"><strike>{ name }</strike></a></td
-                        ></tr>
-                    </table>
-                    
-                    <table style="margin:20px">
-                        <tr><th>Courses catalogue</th></tr>
-                        <tr each={ (my ('all_courses') || {}) .courses }><td
-                            ><a href="#service/participant/course/#{ id }" if={ value (id) (piece (my ('my_courses', '.as_participant .enrolled_courses'))) } ><mark>{ name }</mark></a
-                            ><a href="#service/participant/course/#{ id }" if={ ! value (id) piece (my ('my_courses', '.as_participant .enrolled_courses')) && value (id) (piece (my ('my_courses', '.as_participant .completed_courses'))) } ><strike>{ name }</strike></a
-                            ><a href="#service/participant/course/#{ id }" if={ ! value (id) piece (my ('my_courses', '.as_participant .enrolled_courses')) && ! value (id) (piece (my ('my_courses', '.as_participant .completed_courses'))) } >{ name }</a
-                        ></td></tr>
-                    </table>
-			
-		</div>
-    		<div style="clear: both;"> </div>
-    	</div>
+	<h2 class="subtitle1">Please select what you desire to do.</h2>
+    <table class="table">
+        <tr><th>Courses I am enrolled in</th></tr>
+        <tr each={ my ('my_courses', '.as_participant .enrolled_courses') }
+            ><td><a href="#service/participant/my/course/#{ id }"><mark>{ name }</mark></a></td
+        ></tr>
+    </table>
+    
+    <table class="table">
+        <tr><th>Courses I have completed</th></tr>
+        <tr each={ my ('my_courses', '.as_participant .completed_courses') }
+            ><td><a href="#service/participant/my/course/#{ id }"><strike>{ name }</strike></a></td
+        ></tr>
+    </table>
+    
+    <table class="table">
+        <tr><th>Courses catalogue</th></tr>
+        <tr each={ my ('all_courses', '.courses') }><td
+            ><a href="#service/participant/course/#{ id }" if={ value (id) (piece (my ('my_courses', '.as_participant .enrolled_courses'))) } ><mark>{ name }</mark></a
+            ><a href="#service/participant/course/#{ id }" if={ ! value (id) (piece (my ('my_courses', '.as_participant .enrolled_courses'))) && value (id) (piece (my ('my_courses', '.as_participant .completed_courses'))) } ><strike>{ name }</strike></a
+            ><a href="#service/participant/course/#{ id }" if={ ! value (id) (piece (my ('my_courses', '.as_participant .enrolled_courses'))) && ! value (id) (piece (my ('my_courses', '.as_participant .completed_courses'))) } >{ name }</a
+        ></td></tr>
+    </table>
     
     
 </layout-default>
@@ -42,12 +34,14 @@
 <script>
 (function (self) {
     most .periodic (500)
+        .until (lifecycle (self))
         .thru (content .courses)
         .tap (display_errors)
         .observe (function (courses) {
             self .emit ('all_courses', courses);
         });
     most .periodic (500)
+        .until (lifecycle (self))
         .thru (content .my_courses)
         .tap (display_errors)
         .observe (function (courses) {
@@ -68,3 +62,10 @@
 })(this);
 </script>
 
+<style>
+    .participant-image {
+        height: 300px;
+        position: relative;
+        left: 32.5%;
+    }
+</style>

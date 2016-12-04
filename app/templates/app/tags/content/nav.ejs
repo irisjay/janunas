@@ -12,18 +12,9 @@
     </span>
     
     <div class="nav-right nav-menu">
-        <a class="nav-item" href="#">
-            Participant
-        </a>
-        <a class="nav-item" href="#">
-            Instructor
-        </a>
-        <a class="nav-item" href="#">
-            Administrator
-        </a>
         
         <span class="nav-item">
-            <a class="button" <%- ref ('logout') %>>
+            <a class="button" onclick={ aasdf }>
                 <span class="icon">
                     <i class="fa fa-sign-out"></i>
                 </span>
@@ -34,25 +25,22 @@
 </nav>
 
 <style>
-    <%- tag %> nav {
+    <%- tag %> nav.nav {
         background-color: <%- company_color %>;
     }
-    <%- tag %> nav .nav-item:not(:hover) {
-        color: white !important;
+    <%- tag %> nav.nav .nav-item:not(:hover) {
+        color: white;
     }
 </style>
 
 <script>
-(function (self) {
-	connects ({
-		logout: each_ref ('logout')
-	}) (self);
-	self .on ('logout',  function (logout) {
-        most .fromEvent ('click', logout)
+	aasdf (){
+        most .just ()
             .thru (util .logout)
-            .observe (function () {
-                window .location .hash = '#home';
+            .until (lifecycle (this))
+            .observe (function (login) {
+                if (login === undefined)
+                    window .location .hash = '#home';
             });
-	});
-})(this);
+	}
 </script>

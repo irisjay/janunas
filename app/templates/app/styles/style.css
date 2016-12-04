@@ -18,8 +18,16 @@ body {
 .cursor-pointer {
     cursor: pointer;
 }
-
-
+.title {
+    font-size: 30;
+    text-align: center;
+    color: #101010;
+}
+.subtitle1 {
+    text-align: center;
+    font-size: 22px;
+    color: #696969;
+}
 .scroll {
     overflow-x: hidden;
     overflow-y: scroll !important;

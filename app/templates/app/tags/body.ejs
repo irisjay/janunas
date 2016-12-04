@@ -45,7 +45,8 @@
 		if (! window .location .hash)
 			window .location .hash = '#home';
 		
-		window .addEventListener ('hashchange', reload);
+		most .fromEvent ('hashchange', window)
+			.observe (reload);
 		reload ();
 							
 	})(this);

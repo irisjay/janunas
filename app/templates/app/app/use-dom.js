@@ -56,10 +56,6 @@ riot .mixin (
 									};
 						self .self = self;
 						
-						remembers ({
-							refs: {}
-						});
-						
 				        //capturing bubbling events
 			        	self .root .addEventListener ('emit', function (event) {
 			        		var detail = event .detail;

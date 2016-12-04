@@ -1,19 +1,19 @@
 <layout-default>
 	
-	<h2>{ value (my ('module_order'), '.name') (assemble (my ('course', '.course .module_set')))}</h2>
+	<h1 class="title">{ value (my ('module_order'), '.name') (assemble (my ('course', '.course .module_set'))) }</h1>
 
-	<table>
-		<tr><th>Components</th><th></th></tr>
-		<tr each={ value (my ('module_order'), '.component_set') (assemble (my ('course', '.course .module_set'))) ) }
+	<table class="table">
+		<tr><th>Components</th><th/><th/></tr>
+		<tr each={ assemble(value (my ('module_order'), '.component_set') (assemble (my ('course', '.course .module_set')))) }
 			><td><a href="#service/instructor/component/#{ recalls ('course_id') }/{ recalls ('module_order') }/{ order }">{ name }</a></td
-			><td><button order={ order } <%- ref ('delete_component') %> >x</button></td
-			><td><button order={ order } <%- ref ('shift_component') %> >shift</button></td
+			><td><button class="localbutton button is-outlined is-info" order={ order } <%- ref ('delete_component') %> >x</button></td
+			><td><button class="localbutton button is-outlined is-info" order={ order } onclick={ emit.bind(self,'fk',+order) } >shift down</button></td
 		></tr>
 	</table>
 	
-	<button type="submit" <%- ref ('add_component') %> >
+	<a class="localbutton button is-outlined is-info" type="submit" href="{ '#service/instructor/component/add/#' + self .my ('course_id') + '/' + self .my ('module_order') }" >
 		Add component
-	</button>
+	</a>
 
 </layout-default>
 
@@ -38,11 +38,6 @@
 			delete_component: each_ref ('delete_component'),
 			shift_component: each_ref ('shift_component')
 		}) (self);
-		self .on ('add_component', function (add_component) {
-			add_component .addEventListener ('click', function () {
-				window .location .hash = '#service/instructor/component/add/#' + self .my ('course_id') + '/' + self .my ('module_order')
-			});
-		});
 		self .on ('delete_component', function (delete_component) {
 			delete_component .addEventListener ('click', function () {
 				var order = delete_component .getAttribute ('order');
@@ -51,13 +46,12 @@
 				});
 			});
 		});
-		self .on ('shift_component', function (shift_component) {
-			shift_component .addEventListener ('click', function () {
-				var order = shift_component .getAttribute ('order');
-				self .emit ('reorder', {
-					component_1_order: +order,
-					component_2_order: (+order + 1) % assemble (value ('.module_order .component_set') (assemble (self .my ('course', '.course .module_set')))) .length
-				});
+		
+		self .remembers ('fk');
+		self .on ('fk', function (order) {
+			self .emit ('reorder', {
+				component_1_order: +order,
+				component_2_order: (+order + 1) % assemble (value (self .my ('module_order'), '.component_set') (assemble (self .my ('course', '.course .module_set')))) .length
 			});
 		});
 		
@@ -73,26 +67,24 @@
 		
 		
 		
-		
-		remembers ({
-			input:	function (args) {
-						var course_id = args [0];
-						var module_order = args [1];
-						
-						most .periodic (500)
-							.thru (content .course (course_id))
-							.tap (display_errors)
-							.observe (function (course) {
-								self .emit ('course', course);
-							});
-						self .emit ('course_id', course_id);
-						self .emit ('module_order', module_order);
-							
-						connects ({
-							delete: util .component_delete (course_id, module_order),
-							reorder: util .component_reorder (course_id, module_order)
-						}) (self);
-					}
+		self .remembers ('input');
+		self .on ('input', function (args) {
+			var course_id = args [0];
+			var module_order = args [1];
+			
+			most .periodic (300)
+				.thru (content .course (course_id))
+				.tap (display_errors)
+				.observe (function (course) {
+					self .emit ('course', course);
+				});
+			self .emit ('course_id', course_id);
+			self .emit ('module_order', module_order);
+				
+			connects ({
+				delete: util .component_delete (course_id, module_order),
+				reorder: util .component_reorder (course_id, module_order)
+			}) (self);
 		});
 	})(this);
 </script>

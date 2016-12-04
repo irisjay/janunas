@@ -1,11 +1,11 @@
-<layout-default>
+<layout-primary>
         
     <!-- Header -->
     <header class="hero is-fullheight is-info">
     	<div class="hero-body">
     		<div class="container has-text-centered">
-    			<h1 class="title is-1">Staff Development Program</h1>
-    			<p class="subtitle">Bring out the inner potential in all of your employees.</p>
+    			<h1 class="title is-1 dark-title">Staff Development Program</h1>
+    			<p class="subtitle dark-title">Bring out the inner potential in all of your employees.</p>
     			<a href="#login" class="button is-info is-large">Login</a> 
     		</div>
     	</div>
@@ -46,7 +46,7 @@
     </section>
     
     <!-- Content 3 -->
-    <section class="hero is-info">
+    <section class="hero is-admin">
     	<div class="hero-body">
             <div class="container">
             	<div class="columns is-vcentered">
@@ -70,9 +70,29 @@
     </section>
     
 
-</layout-default>
+</layout-primary>
 
 <style>
+.button.is-info {
+  background-color: <%- company_color%>;
+  border-width: 0;
+  color: white;
+}
+
+.button.is-info:hover, .button.is-info:focus, .button.is-info.is-active {
+  background-color: white;
+  border-color: <%- company_color%>;
+  color: <%- company_color%>;
+}
+
+.is-admin {
+    background-color: #fefefe;
+}
+
+.dark-title {
+    color: #696969 !important;
+}
+
 html,
 body {
     width: 100%;

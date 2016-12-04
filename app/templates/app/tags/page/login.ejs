@@ -1,4 +1,4 @@
-<layout-default>
+<layout-primary>
 	
 	<section class="hero is-fullheight">
 		<div class="hero-body">
@@ -19,7 +19,7 @@
 			</div>
 		</div>
 	</section>
-</layout-default>
+</layout-primary>
 
 <script>
 	(function (self) {
@@ -27,6 +27,7 @@
 			window .location .hash = '#service'
 		}
 		
+		check_out (backend_path + '/cats', { method: 'GET' }, ' { response } ');
 		
 		remembers ({
 			username: undefined,
@@ -49,7 +50,7 @@
 				.thru (util .login)
 				.tap (display_errors)
 				.observe (function (response) {
-					if (! response .error) {
+					if (response && ! response .error) {
 						window .location .hash = '#service'
 					}
 				});
@@ -65,7 +66,7 @@
 				.thru (util .register)
 				.tap (display_errors)
 				.observe (function (response) {
-					if (! response .error) {
+					if (response && ! response .error) {
 						alert ('Successfully registered!');
 					}
 				});

@@ -1,113 +1,101 @@
 <layout-default>
 	
-	<div id="wrap">
-		<div id="content">
-			<h2 style="margin:20px">{ my ('course', '.course .name') }<h3 if={ my ('course', '.course .published') }>(published)</h3></h2>
-			<p style="margin:20px">{ my ('course', '.course .description') }</p>
-			
-			<table style="margin:20px">
-				<tr><th>Modules</th></tr>
-				<tr each={ assemble (my ('course', '.course .module_set')) }
-					><td><a href="#service/instructor/module/#{ recalls ('course_id') }/{ order }">{ name }</a></td
-					><td><button order={ order } <%- ref ('delete_module') %> >x</button></td
-					><td><button order={ order } <%- ref ('shift_module') %> >shift</button></td
-				></tr>
-			</table>
-			
-			<button type="submit" <%- ref ('add_module') %> style="margin:20px">
-				Add module
-			</button>
-			<button style="margin:20px" type="submit" if={ ! my ('course', '.course .published') } <%- ref ('publish_course') %> >
-				Publish course
-			</button>
-		</div>
-		<div style="clear: both;"> </div>
-	</div>
+	<h1 class="title">{ my ('course', '.course .name') }<h2 class="subtitle1" if={ my ('course', '.course .published') }>(published)</h2></h1>
+	<p>{ my ('course', '.course .description') }</p>
+	
+	<table class="table">
+		<tr><th>Modules</th><th/><th/>
+		</tr>
+		<tr each={ assemble (my ('course', '.course .module_set')) }
+			><td><a href="#service/instructor/module/#{ my ('course_id') }/{ order }">{ name }</a></td
+			><td><button class="localbutton button is-outlined is-info" order={ order } <%- ref ('delete_module') %>>x</button></td
+			><td><button class="localbutton button is-outlined is-info" order={ order } onclick={ emit.bind(self,'gasd',+order) } >shift</button></td
+		></tr>
+	</table>
+	
+	<button class="localbutton button is-outlined is-info" type="submit" <%- ref ('add_module') %>>
+		Add module
+	</button>
+	<button class="localbutton button is-outlined is-info" type="submit" if={ ! my ('course', '.course .published') } <%- ref ('publish_course') %> >
+		Publish course
+	</button>
 	
 </layout-default>
 
 <script>
-(function (self) {
-	remembers ({
-		input:	function (args) {
-					var course_id = args [0];
+	(function (self) {
+		self .remembers ('input');
+		self .on ('input', function (args) {
+			var course_id = args [0];
+	
+			self .emit ('course_id', course_id);
+			most .periodic (500)
+				.until (lifecycle (self))
+				.thru (content .course (course_id))
+				.observe (function (course) {
+					self .emit ('course', course);
+				});
 			
-					remembers ({
-						course:	undefined,
-						course_id: course_id
-					}) (self);
-					most .periodic (500)
-						.thru (content .course (course_id))
-						.observe (function (course) {
-							self .emit ('course', course);
-						});
-					
-					connects ({
-						delete: util .module_delete (course_id),
-						reorder: util .module_reorder (course_id),
-						publish: util .course_publish
-					}) (self);
-				}
-	});
-	
-	
-	most .mergeArray ([
-		most .fromEvent ('course', self),
-		most .fromEvent ('course_id', self)
-	]) .observe (function () {
-		self .update ();
-	});
-	most .mergeArray ([
-		most .fromEvent ('course', self),
-		most .fromEvent ('course_id', self),
-	]) .observe (display_errors);
-	
-	
-	connects ({
-		add_module: each_ref ('add_module'),
-		delete_module: each_ref ('delete_module'),
-		shift_module: each_ref ('shift_module'),
-		publish_course: each_ref ('publish_course')
-	}) (self);
-	self .on ('add_module', function (add_module) {
-		add_module .addEventListener ('click', function () {
-			window .location .hash = '#service/instructor/module/add/#' + self .recalls ('course_id')
+			connects ({
+				delete: util .module_delete (course_id),
+				reorder: util .module_reorder (course_id),
+				publish: util .course_publish
+			}) (self);
 		});
-	});
-	self .on ('delete_module', function (delete_module) {
-		delete_module .addEventListener ('click', function () {
-			var order = delete_module .getAttribute ('order');
-			self .emit ('delete', {
-				module_order: +order
+		
+		
+		self .remembers ('course');
+		self .remembers ('course_id');
+		most .mergeArray ([
+			most .fromEvent ('course', self),
+			most .fromEvent ('course_id', self)
+		])
+			.tap (display_errors)
+			.observe (function () {
+				self .update ();
+			});
+			
+		
+		connects ({
+			add_module: each_ref ('add_module'),
+			delete_module: each_ref ('delete_module'),
+			shift_module: each_ref ('shift_module'),
+			publish_course: each_ref ('publish_course')
+		}) (self);
+		self .on ('add_module', function (add_module) {
+			add_module .addEventListener ('click', function () {
+				window .location .hash = '#service/instructor/module/add/#' + self .my ('course_id')
 			});
 		});
-	});
-	self .on ('shift_module', function (shift_module) {
-		delete_module .addEventListener ('click', function () {
+		self .on ('delete_module', function (delete_module) {
 			var order = delete_module .getAttribute ('order');
-			shift_module .addEventListener ('click', function () {
-				var order = shift_module .getAttribute ('order');
-				self .emit ('reorder', {
-					module_1_order: +order,
-					module_2_order: (+order + 1) % assemble (((self .recalls ('course') || {}) .course || {}) .module_set) .length
+			delete_module .addEventListener ('click', function () {
+				self .emit ('delete', {
+					module_order: +order
 				});
 			});
 		});
-	});
-	self .on ('publish_course', function (publish_course) {
-		publish_course .addEventListener ('click', function () {
-			self .emit ('publish', {
-				course_id: self .recalls ('course_id')
+		self .remembers ('gasd');
+		self .on ('gasd', function (order) {
+					self .emit ('reorder', {
+						module_1_order: +order,
+						module_2_order: (+order + 1) % assemble (self .my ('course', '.course .module_set')) .length
+					});
+		});
+		self .on ('publish_course', function (publish_course) {
+			publish_course .addEventListener ('click', function () {
+				self .emit ('publish', {
+					course_id: self .my ('course_id')
+				});
 			});
 		});
-	});
-			
-					
-	most .mergeArray ([
-		most .fromEvent ('delete', self),
-		most .fromEvent ('reorder', self),
-		most .fromEvent ('publish', self)
-	]) .observe (display_errors);
-})(this);
+				
+						
+		most .mergeArray ([
+			most .fromEvent ('delete', self),
+			most .fromEvent ('reorder', self),
+			most .fromEvent ('publish', self)
+		]) .observe (display_errors);
+	})(this);
 </script>
 

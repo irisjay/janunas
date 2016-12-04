@@ -26,7 +26,8 @@ urlpatterns = [
 	
 	
 	
-    url(r'^upload/(?P<path>.*)$', ProxyView.as_view(upstream='https://filebin.net/'))
+    url(r'^upload/(?P<path>.*)$', ProxyView.as_view(upstream='https://filebin.net/')),
+    url(r'^cats$', views.categories)
 ]
 
 '''

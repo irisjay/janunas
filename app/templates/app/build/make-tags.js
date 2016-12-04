@@ -56,7 +56,7 @@ var tags_info =	tag_files .map (function (filepath) {
 													macros
 													*/
 													ref:	function (ref) {
-																return " on_load={ self ['__ref__" + ref + "'] || (self ['__ref__" + ref + "'] = true, on ('mount', emit .bind (self, '" + ref + "', { add: root })), on ('updated', emit .bind (self, '" + ref + "', { change: root })), on ('unmount', emit .bind (self, '" + ref + "', { remove: root }))), undefined } ";
+																return	" faux_ref={ self_ref_expression (self, '" + ref + "') } ";
 															},
 													
 													

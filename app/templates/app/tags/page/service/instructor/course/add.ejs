@@ -1,59 +1,64 @@
 <layout-default>
 	
-	<div id="wrap">
-		<div id="content">
-			<h2>Add Course</h2><br/>
-			<label style="margin:20px">Course name: </label><br/>
-			<input type="text" style="width:400px; margin:20px" <%- ref ('course_name') %> >
-			<br/><br/>
-			<label style="margin:20px">Course description: </label><br/>
-			<textarea rows="4" style="width:400px; margin:20px" <%- ref ('course_description') %> />
-			<br/>
-			<br/>
-			<label style-"margin:20px">Course category: </label><br/>
-			<select <%- ref ('course_category') %> >
-				<option value="Mergers and Acquisitions">Mergers and Acquisitions</option>
-				<option value="Markets">Markets</option>
-				<option value="Risk Management">Risk Management</option>
-				<option value="Securities">Securities</option>
-				<option value="Financial Modeling">Financial Modeling</option>
-				<option value="Operations">Operations</option>
-				<option value="Information Technology">Information Technology</option>
-			</select>
-			<button type="submit" style="margin:20px" <%- ref ('add_course') %> >
-				Add course
-			</button>
-		</div>
-		<div style="clear: both;"> </div>
-	</div>
+	<h1 class="title">Add Course</h2><br/>
+	<label>Course name: </label><br/>
+	<input type="text" style="width:400px; margin:20px" <%- ref ('__course_name') %> >
+	<br/><br/>
+	<label>Course description: </label><br/>
+	<textarea rows="4" style="width:400px; margin:20px" <%- ref ('__course_description') %> />
+	<br/>
+	<br/>
+	<label style-"margin:20px">Course category: </label><br/>
+	<select style="margin:20px" <%- ref ('__course_category') %> >
+		<option value={ cat } each={ cat, dog in (get_cache(backend_path + '/cats')).split (',') }>{ cat }</option>
+	</select><br/><br/>
+	<button class="localbutton button is-outlined is-info" type="submit" onclick={ emit .bind (self, 'asd') }>
+		Add course
+	</button>
 	
 </layout-default>
 
 <script>
 	(function (self) {
+		self .remembers ('course_name');
+		self .remembers ('course_description');
+		self .remembers ('course_category');
 		connects ({
-			course_name: each_ref ('course_name'),
-			course_description: each_ref ('course_description'),
-			course_category: each_ref ('course_category'),
+			__course_name: each_ref ('__course_name'),
+			__course_description: each_ref ('__course_description'),
+			__course_category: each_ref ('__course_category'),
 			add_course: each_ref ('add_course')
 		}) (self);
-		
-		self .on ('add_course', function (add_course) {	
-			most .fromEvent ('click', add_course)
-				.map (function () {
-					return	{
-				                course_name: course_name .value,
-				                course_description: course_description .value,
-				                course_category: course_category .value
-				            };
-				})
-				.thru (util .course_new)
-				.tap (display_errors)
-				.observe (function (response) {
-					if (! response .error) {
-						window .location .hash = '#service/instructor/'
-					}
-				});
+		self .on ('__course_name', function (course_name) {
+			course_name .addEventListener ('input', function () {
+				self .emit ('course_name', course_name .value);
+			});
+		});
+		self .on ('__course_description', function (course_description) {
+			course_description .addEventListener ('input', function () {
+				self .emit ('course_description', course_description .value);
+			});
+		});
+		var c;
+		self .on ('__course_category', function (course_category) {
+			c = course_category;
+			course_category .addEventListener ('input', function () {
+				self .emit ('course_category', course_category .value);
+			});
+		});
+		self .remembers('asd');
+		self .on ('asd', function () {
+			most .just ({
+                course_name: self .my ('course_name'),
+                course_description: self .my ('course_description'),
+                course_category: self .my ('course_category') || (!!c && c.value.trim())
+            })
+			.thru (util .course_new)
+			.observe (function (response) {
+				if (! response .error) {
+					window .location .hash = '#service/instructor/'
+				}
+			});
 		});
 	})(this);
 </script>

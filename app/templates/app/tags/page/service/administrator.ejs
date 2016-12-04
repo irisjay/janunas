@@ -1,49 +1,33 @@
 <layout-default>
+	<img class="admin-image" src="https://cdn1.iconfinder.com/data/icons/client-management/512/key-512.png" alt="Exercise control over the system.">
+	<h1 class="title">Administrator Services</h1>
+	<h2 class="subtitle1">Please select what you desire to do.</h2>	
 	
-	<title>Administrator Services</title>
-    
-	<div id="wrap">
-	    <h1>
-            Welcome administrator!
-        </h1>
-		<div id="content">
-			<h2 style="margin:20px"> Administrator Services </h2>
-			<p style="margin:20px">Please select your desired action.</p>
-				<table style="margin:20px">
+	<table class="table">
 		<tr><th>All Users</th><th></th><th></th></tr>
-		<tr each={ id, user in piece (my ('all_users', '.users')) }
+		<tr each={ user, piece in piece (my ('all_users', '.users')) }
 			><td if={ user .instructor & user .administrator }><mark><strong>{ user .username }</strong></mark></td
 			><td if={ ! user .instructor & user .administrator }><mark>{ user .username }</mark></td
 			><td if={ user .instructor & ! user .administrator }><strong>{ user .username }</strong></td
 			><td if={ ! user .administrator && ! user .instructor }>{ user .username }</td
-			><td if={ ! user .administrator }><button type="submit" user={ user .id } <%- ref ('make_administrator') %> >Make Admin</button></td
-			><td if={ user .administrator }><button user={ user .id } <%- ref ('revoke_administrator') %> >Revoke Admin</button></td
-			><td if={ ! user .instructor }><button type="submit" user={ user .id } <%- ref ('make_instructor') %> >Make Instructor</button></td
-			><td if={ user .instructor }><button user={ user .id } <%- ref ('unmake_instructor') %> >Unmake Instructor</button></td
+			><td if={ ! user .administrator }><button class="localbutton1 button is-outlined is-info" type="submit" user={ user .id } <%- ref ('make_administrator') %> >Make Admin</button></td
+			><td if={ user .administrator }><button class="localbutton1 button is-outlined is-info" user={ user .id } <%- ref ('revoke_administrator') %> >Revoke Admin</button></td
+			><td if={ ! user .instructor }><button class="localbutton1 button is-outlined is-info" type="submit" user={ user .id } <%- ref ('make_instructor') %> >Make Instructor</button></td
+			><td if={ user .instructor }><button class="localbutton1 button is-outlined is-info" user={ user .id } <%- ref ('unmake_instructor') %> >Unmake Instructor</button></td
 		></tr>
 	</table>
 
 			
-		</div>
-		<div style="clear: both;"> </div>
-	</div>
 	
 </layout-default>
 
 <script>
 (function (self) {
-	
-    most .periodic (500)
-    	.thru (content .users)
-    	.tap (display_errors)
-    	.observe (function (users) {
-    		self .emit ('all_users', users);
-    	});
-    	
-	
-	remembers ({
-		'all_users': undefined
-	});
+
+
+	connects ({
+		all_users: content .users
+	}) (self);
 	self .on ('all_users', function () {
 		self .update ();
 	});
@@ -64,8 +48,9 @@
 							edit_type: 'administrator-add',
 							edit_content: 'add'
 						};
-			}) .map (util .user_edit (user))
-			.observe (display_errors);
+			}) .thru (util .user_edit (user))
+			//.tap (display_errors)
+			.observe (rehash);
 	});
 	self .on ('revoke_administrator', function (revoke_administrator) {
 		var user = revoke_administrator .getAttribute ('user');
@@ -76,8 +61,9 @@
 							edit_type: 'administrator-remove',
 							edit_content: 'remove'
 						};
-			}) .map (util .user_edit (user))
-			.observe (display_errors);
+			}) .thru (util .user_edit (user))
+			//.tap (display_errors)
+			.observe (rehash);
 	});
 	self .on ('make_instructor', function (make_instructor) {
 		var user = make_instructor .getAttribute ('user');
@@ -88,8 +74,9 @@
 							edit_type: 'instructor-add',
 							edit_content: 'add'
 						};
-			}) .map (util .user_edit (user))
-			.observe (display_errors);
+			}) .thru (util .user_edit (user))
+			//.tap (display_errors)
+			.observe (rehash);
 	});
 	self .on ('unmake_instructor', function (unmake_instructor) {
 		var user = unmake_instructor .getAttribute ('user');
@@ -100,9 +87,29 @@
 							edit_type: 'instructor-remove',
 							edit_content: 'remove'
 						};
-			}) .map (util .user_edit (user))
-			.observe (display_errors);
+			}) .thru (util .user_edit (user))
+			//.tap (display_errors)
+			.observe (rehash);
 	});
 })(this);
 </script>
 
+<style>
+	:scope .localbutton1 {
+        color: <%- company_color%> !important;
+        border-color: <%- company_color%> !important;
+        border-radius: 0px 0px 0px 0px !important;
+        display: inline;
+        width: 150px;
+    }
+    :scope .localbutton1:hover {
+        color: #ffffff !important;
+        background: <%- company_color%> !important;
+    }
+    
+    .admin-image {
+    	height: 300px;
+    	position: relative;
+    	left: 30%;
+    }
+</style>

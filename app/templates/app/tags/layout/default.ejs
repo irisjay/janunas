@@ -1,4 +1,55 @@
 <!-- Navigation -->
 <content-nav />
 
-<yield />
+
+<section class="section is-fullheight">
+	<div class="container">
+		<div class="columns">
+			<div class="column is-3 shali-color">
+				<content-menu />
+			</div>
+			<div class="column ">
+
+				<yield />
+
+			</div>	
+		</div>
+	</div>
+</section>
+			
+<section>
+	<content-footer />
+</section>
+
+<style>
+	.shali-color {
+	    background-color: #36363d;
+	    overflow: hidden;
+	    margin-left: -20px;
+	    margin-right: 20px;
+	}
+	.shali-color * {
+	    background-color: #36363d !important;
+	    color: white !important;
+	}
+	.menu{
+		background-color: white;
+		border-radius: 4px 4px 4px 4px;
+		position: relative;
+		top: 8px;
+		left: 4px;
+	}
+	.menu-list .is-active {
+		background: <%- company_color%>;
+	}
+	
+	.menu-label{
+		position: relative;
+		top: 5px;
+		right: -7px;
+	}
+	
+	.footer{
+			background-color: <%- company_color%>;
+	}
+</style>

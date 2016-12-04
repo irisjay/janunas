@@ -1,26 +1,21 @@
 <layout-default>
 	
-	<div id="wrap">
-		<div id="content">
-			<h2 if={ (value (my ('module_order', '.done'))) (assemble (my ('course', '.course .module_set')))  }
-				><strike>{ (value (my ('module_order', '.name'))) (assemble (my ('course', '.course .module_set'))) }</strike
-			></h2>
-			<h2 if={ ! (value (my ('module_order', '.done'))) (assemble (my ('course', '.course .module_set'))) }
-				>{ (value (my ('module_order', '.name'))) (assemble (my ('course', '.course .module_set'))) }</h2
-			>
-			
-			<table>
-				<tr><th>Components</th><th></th></tr>
-				<tr each={ assemble (my ('module_order', '.component_set') (assemble (my ('course', '.course .module_set')))) }
-					><td
-						><a href="#service/participant/my/component/#{ my ('course_id') }/{ my ('module_order') }/{ order }" if={ done } ><strike>{ name }</strike></a
-						><a href="#service/participant/my/component/#{ my ('course_id') }/{ my ('module_order') }/{ order }" if={ ! done } >{ name }</a
-					></td
-				></tr>
-			</table>
-			
-		<div style="clear: both;"> </div>
-	</div>
+	<h2 class="subtitle1" if={ value (my ('module_order'), '.done') (assemble (my ('course', '.course .module_set')))  }
+		><strike>{ value (my ('module_order'), '.name') (assemble (my ('course', '.course .module_set'))) }</strike
+	></h2>
+	<h2 class="subtitle1" if={ ! value (my ('module_order'), '.done') (assemble (my ('course', '.course .module_set'))) }
+		>{ value (my ('module_order'), '.name') (assemble (my ('course', '.course .module_set'))) }</h2
+	>
+	
+	<table class="table">
+		<tr><th>Components</th><th></th></tr>
+		<tr each={ assemble (value (my ('module_order'), '.component_set') (assemble (my ('course', '.course .module_set')))) }
+			><td
+				><a href="#service/participant/my/component/#{ my ('course_id') }/{ my ('module_order') }/{ order }" if={ done } ><strike>{ name }</strike></a
+				><a href="#service/participant/my/component/#{ my ('course_id') }/{ my ('module_order') }/{ order }" if={ ! done } >{ name }</a
+			></td
+		></tr>
+	</table>
 	
 </layout-default>
 
@@ -42,25 +37,23 @@
 	
 	
 	
-	remembers ({
-		input:	function (args) {
-					var course_id = args [0];
-					var module_order = args [1];
-					
-					
-					most .periodic (500)
-						.thru (content .course (course_id))
-						.tap (display_errors)
-						.observe (function (course) {
-							self .emit ('course', course);
-						});
-					
-					remembers ({
-						course_id: course_id,
-						module_order: module_order
-					}) (self);
-				}
-	}) (self);
+	self .remembers ('input');
+	self .on ('input', function (args) {
+		var course_id = args [0];
+		var module_order = args [1];
+		
+		
+		most .periodic (500)
+			.until (lifecycle (self))
+			.thru (content .course (course_id))
+			.tap (display_errors)
+			.observe (function (course) {
+				self .emit ('course', course);
+			});
+		
+		self .emit ('course_id', course_id);
+		self .emit ('module_order', module_order);
+	});
 })(this);
 </script>
 
