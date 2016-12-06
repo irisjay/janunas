@@ -100,9 +100,33 @@ def course_enroll(request, course_id):
         else:
             course = Course.objects.get(id=course_id)
             participant.enrolled_courses.add(course)
+            
+            if participant.completed_courses.filter(id=course_id).count() >= 1:
+                for module in course.module_set.all():
+                    for component in module.component_set.all():
+                        participant.completed_components.remove(component)
+                    participant.completed_modules.remove(module)
+                participant.completed_courses.remove(course)
+            
             participant.save()
             
         data = {'enrolled':True}
+        
+        return JsonResponse(data)
+    except Exception as error:
+        return JsonResponse({'error': repr(error)})
+
+def course_drop(request, course_id):
+    try:
+        user_id = request.META['HTTP_X_USER']
+        
+        user = User.objects.get(id=user_id)
+        participant = user.as_participant
+        course = participant.enrolled_courses.get(id=course_id)
+        participant.enrolled_courses.remove(course)
+        participant.save()
+            
+        data = {'dropped':True}
         
         return JsonResponse(data)
     except Exception as error:
@@ -355,6 +379,8 @@ def users(request):
         
         user = User.objects.get(id=user_id)
         admin = user.as_administrator
+        if admin is None:
+            raise Exception('Access denied')
         users = User.objects.all()
         
         data = {'users':[serialize_user(user) for user in users]}
@@ -369,6 +395,8 @@ def user(request, his_user_id):
         
         user = User.objects.get(id=user_id)
         admin = user.as_administrator
+        if admin is None:
+            raise Exception('Access denied')
         him = User.objects.get(id=his_user_id)
         
         data = {'user':serialize_user(user)}
@@ -383,6 +411,10 @@ def user_edit(request, his_user_id):
         
         user = User.objects.get(id=user_id)
         admin = user.as_administrator
+        
+        if admin is None:
+            raise Exception('Access denied')
+        
         him = User.objects.get(id=his_user_id)
         
         if 'HTTP_X_USERNAME' in request.META:
@@ -502,10 +534,11 @@ def serialize_course(self, participant):
         'id': self.id,
         'name': self.name,
         'description': self.description,
+        'category': self.category.name,
         'published': self.published,
         'done': self.completed_participants.filter(id=participant.id).count(),
         'instructor': [him.id for him in self.instructor.all()],
-        'participant': [him.id for hiim in self.participant.all()],
+        'participant': [him.id for him in self.participant.all()],
         'module_set': [serialize_module(module, participant) for module in self.module_set.all()]
     }
 def serialize_module(self, participant):

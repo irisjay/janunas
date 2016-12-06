@@ -22,21 +22,24 @@
 
 <script>
 (function (self) {
+	
 	most .periodic (500)
-        .until (lifecycle (self))
 		.thru (content .my_courses)
+		.skipRepeatsWith (json_equal)
 		.tap (display_errors)
-		.observe (function (my_courses) {
+        .until (lifecycle (self))
+		.thru (consume (self, function (my_courses) {
 			self .emit ('my_courses', my_courses);
-		});
+		}));
 	
 	
 	remembers ({
 		my_courses: undefined
 	}) (self);
-	self .on ('my_courses', function () {
-		self .update ();
-	});
+	most .fromEvent ('my_courses', self)
+		.thru (consume (self, function () {
+			self .update ();
+		}))
 	
 	
 	connects ({

@@ -30,9 +30,7 @@ riot .mixin (
 					(function (self) {
 											var send_event =	function (element) {
 																	return	function (what, how) {
-																				element .dispatchEvent (
-																					new CustomEvent ('emit', { detail: { what: what, how: how }, bubbles: true } )
-																				);
+																				send_dom_event (element) ('emit', { what: what, how: how });
 																			};
 																};
 						self .scope =	scope ({
@@ -46,15 +44,10 @@ riot .mixin (
 											//logging
 											on:	{
 													new_memory:	function (/*what, how, other args*/) {
-														            log ([self] .concat .apply ([] .slice .call (arguments)));
+														            log ([self] .concat ([] .slice .call (arguments)));
 																}
 												}
 										});
-										
-						self .my =	function (what, property_name) {
-										return value (property_name) (self .recalls (what));
-									};
-						self .self = self;
 						
 				        //capturing bubbling events
 			        	self .root .addEventListener ('emit', function (event) {
@@ -63,6 +56,112 @@ riot .mixin (
 			        		event .stopPropagation ();
 			        		return false;
 			        	}, false);
+					}) (this);			
+				}
+	} );
+/*
+Use riot interaction layer
+*/
+riot .mixin (
+	{
+		init:	function () {
+					(function (self) {
+						most .mergeArray ([
+							most .fromEvent ('mount', self),
+							most .fromEvent ('updated', self),
+							most .fromEvent ('before-unmount', self)
+						]) .loop (function (last_refs, changed) {
+						    return	{
+						    			seed: consistentfy (self .refs),
+						    			value: diff_refs (last_refs, self .refs)
+						    		};
+						}, {}) .chain (most .from)
+						.thru (consume (self, 
+							function (change) {
+								var diff = {};
+								diff [change .type] = change .node;
+								
+								if (change .type === 'remove')
+									send_dom_event (change .node) ('unmount');
+								self .emit (change .ref, diff);
+						}));
+					}) (this);			
+				}
+	} );
+						var consistentfy =	function (original_refs) {
+												var shallow_refs = {};
+												for (var ref in original_refs) {
+													shallow_refs [ref] = original_refs [ref]
+													if (! shallow_refs [ref] .length)
+														shallow_refs [ref] = [shallow_refs [ref]];
+													else
+														shallow_refs [ref] = shallow_refs [ref] .slice ();
+												}
+												return shallow_refs;
+											};
+						var diff_refs =	function (last_refs, now_refs) {
+											now_refs = consistentfy (now_refs);
+							
+										    var diff = [];
+										    //debugger;
+										    for (var ref in now_refs) {
+										    	for (var node of now_refs [ref]) {
+										    		var node_index;
+										    		if (last_refs [ref] && (node_index = last_refs [ref] .indexOf (node)) !== -1) {
+										    			last_refs [ref] .splice (node_index, 1);
+										    		}
+										    		else {
+										    			diff .unshift ({ ref: ref, type: 'add', node: node });
+										    			node .consume =	function (stream, observer) {
+														    				stream .thru (consume (node, observer))
+														    				return node;
+														    			} 
+										    		}
+										    	}
+										    } 
+										    for (var ref in last_refs) {
+										    	for (var node of last_refs [ref]) {
+										    		diff .unshift ({ ref: ref, type: 'remove', node: node });
+										    	}
+										    } 
+										    return diff;
+										};
+/*
+Riot conveniece methods
+*/
+riot .mixin (
+	{
+		init:	function () {
+					(function (self) {
+						self .my =	function (what, property_name) {
+										return value (property_name) (self .recalls (what));
+									};
+						self .self = self;
+						
+						self .records =	function (data) {
+											for (var name in data) {
+												self .remembers (name);
+												self .emit (name, data [name]);
+											}
+											return self;
+										};
+						self .processes =	function (connections) {
+												for (var name in connections) {
+													self .connects (name, connections [name]);
+												}
+												return self;
+											};
+						self .handles =	function (listeners) {
+											for (var name in listeners) {
+												self .remembers (name);
+												self .on (name, listeners [name]);
+											}
+											return self;
+										};
+						self .consume =	function (stream, observer) {
+											stream .thru (consume (self, observer));
+											return self;
+										};
 					}) (this);			
 				}
 	} );
@@ -97,6 +196,13 @@ window .Element && (function (ElementPrototype) {
 
 
 
+											var send_dom_event =	function (element) {
+																		return	function (what, details) {
+																					element .dispatchEvent (
+																						new CustomEvent (what, { detail: details, bubbles: true } )
+																					);
+																				};
+																	};
 
 
 	

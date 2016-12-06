@@ -61,8 +61,14 @@ var scope = function (args) {
     											return self .__parent .recalls (what);
     									};
 					self .emit =   function (what, how) {
-										if (self .__memory_pathway [what])
-											self .__incoming_memory .trigger (what, how); //IMPORTANT: variadic event values are compressed into array by mostjs. Compress myself explicitly.
+										if (self .__memory_pathway [what]) {
+											
+											self .__last_memory [what] = (self .__incoming_memory_filter [what] || function (how) { return how; }) (how);
+										    if ((args .on || {}) .new_memory)
+												args .on .new_memory .apply (this, arguments);
+												
+											self .__incoming_memory .trigger (what, how);
+										}
 										else if (self .__parent)
 											self .__parent .emit .apply (this, arguments);
 										else if (args .ex_emit) {
@@ -91,19 +97,6 @@ var scope = function (args) {
     				}
 	
 	
-	
-				    self .on ('*', function (what, how) {
-						if (self .__memory_pathway [what]) {
-							self .__last_memory [what] = (self .__incoming_memory_filter [what] || function (how) { return how; }) (how);
-						}
-				    });
-				    if ((args .on || {}) .new_memory)
-					    self .on ('*', function (what, how) {
-							if (self .__memory_pathway [what]) {
-								args .on .new_memory .apply (this, arguments);
-							}
-					    });	
-				    
 				    return self;
                 }) ({});
 			};	

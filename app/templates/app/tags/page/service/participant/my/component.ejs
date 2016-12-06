@@ -46,6 +46,40 @@
 					)
 				)
 	}</p>
+	<span each={ url, key in
+							((parse ((value (my ('component_order'), '.files') (
+								assemble (
+									value (my ('module_order'), '.component_set') (
+										assemble (my ('course', '.course .module_set'))
+									)
+								)
+							))) || [] ).filter) (is_picture)
+	}
+		><img src={ url } >
+	<br></span>
+	<span each={ url, key in
+							((parse ((value (my ('component_order'), '.files') (
+								assemble (
+									value (my ('module_order'), '.component_set') (
+										assemble (my ('course', '.course .module_set'))
+									)
+								)
+							))) || [] ).filter) (not_picture)
+	}
+		><a href={ url } >{ filename (url) }</a
+	><br></span>
+	<span each={ video, key in
+							((parse ((value (my ('component_order'), '.videos') (
+								assemble (
+									value (my ('module_order'), '.component_set') (
+										assemble (my ('course', '.course .module_set'))
+									)
+								)
+							))) || [] ))
+	}
+		><iframe width="420" height="315"
+			src="https://www.youtube.com/embed/{ video }">
+	</iframe><br></span>
 	
 	<button class="localbutton button is-outlined is-info" disabled if={
 							value (my ('component_order'), '.done' ) (
@@ -96,6 +130,20 @@
 		connects ({
 			done_component:	each_ref ('done_component')
 		}) (self);
+		self .on ('done_component',	function (done_component) {
+			most .combineArray (function (x,y,z) {return [x,y,z];}, [
+					most .fromEvent ('course', self),
+					most .fromEvent ('module_order', self),
+					most .fromEvent ('component_order', self)
+				]) .filter (function (data) {
+					return data [0] !== undefined && data [1] !== undefined && data[2] !== undefined;
+				}) .map (function (data) {
+					data [0] = data [0] .course .id
+					return util .component_done .apply (self, data);
+				}) .chain (function (action) {
+					return action (most .fromEvent ('click', done_component));
+				}) .observe (display_errors);
+		});
 	
 	
 	
@@ -107,9 +155,10 @@
 			var component_order = args [2];
 			
 			
-			most .periodic (50000)
+			most .periodic (500)
 				.until (lifecycle (self))
 				.thru (content .course (course_id))
+				.skipRepeatsWith (json_equal)
 				.tap (display_errors)
 				.observe (function (course) {
 					self .emit ('course', course)
@@ -118,14 +167,6 @@
 			
 			self .emit ('module_order', module_order);
 			self .emit ('component_order', component_order);
-			
-			
-			self .on ('done_component',	function (done_component) {
-				most .fromEvent ('click', done_component)
-					.thru (util .component_done (course_id, module_order, component_order))
-					.tap (display_errors)
-					.observe (rehash);
-			});
 		});
 })(this);
 </script>

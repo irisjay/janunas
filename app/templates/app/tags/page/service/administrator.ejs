@@ -10,89 +10,13 @@
 			><td if={ ! user .instructor & user .administrator }><mark>{ user .username }</mark></td
 			><td if={ user .instructor & ! user .administrator }><strong>{ user .username }</strong></td
 			><td if={ ! user .administrator && ! user .instructor }>{ user .username }</td
-			><td if={ ! user .administrator }><button class="localbutton1 button is-outlined is-info" type="submit" user={ user .id } <%- ref ('make_administrator') %> >Make Admin</button></td
-			><td if={ user .administrator }><button class="localbutton1 button is-outlined is-info" user={ user .id } <%- ref ('revoke_administrator') %> >Revoke Admin</button></td
-			><td if={ ! user .instructor }><button class="localbutton1 button is-outlined is-info" type="submit" user={ user .id } <%- ref ('make_instructor') %> >Make Instructor</button></td
-			><td if={ user .instructor }><button class="localbutton1 button is-outlined is-info" user={ user .id } <%- ref ('unmake_instructor') %> >Unmake Instructor</button></td
+			><td if={ ! user .administrator }><button class="localbutton1 button is-outlined is-info" type="submit" user={ user .id } ref="make_administrator" >Make Admin</button></td
+			><td if={ user .administrator }><button class="localbutton1 button is-outlined is-info" user={ user .id } ref="revoke_administrator" >Revoke Admin</button></td
+			><td if={ ! user .instructor }><button class="localbutton1 button is-outlined is-info" type="submit" user={ user .id } ref="make_instructor" >Make Instructor</button></td
+			><td if={ user .instructor }><button class="localbutton1 button is-outlined is-info" user={ user .id } ref="unmake_instructor" >Unmake Instructor</button></td
 		></tr>
 	</table>
-
-			
-	
 </layout-default>
-
-<script>
-(function (self) {
-
-
-	connects ({
-		all_users: content .users
-	}) (self);
-	self .on ('all_users', function () {
-		self .update ();
-	});
-
-	
-	connects ({
-		make_administrator: each_ref ('make_administrator'),
-		revoke_administrator: each_ref ('revoke_administrator'),
-		make_instructor: each_ref ('make_instructor'),
-		unmake_instructor: each_ref ('unmake_instructor')
-	}) (self);
-	self .on ('make_administrator', function (make_administrator) {
-		var user = make_administrator .getAttribute ('user');
-		
-		most .fromEvent ('click', make_administrator)
-			.map (function () {
-				return	{
-							edit_type: 'administrator-add',
-							edit_content: 'add'
-						};
-			}) .thru (util .user_edit (user))
-			//.tap (display_errors)
-			.observe (rehash);
-	});
-	self .on ('revoke_administrator', function (revoke_administrator) {
-		var user = revoke_administrator .getAttribute ('user');
-		
-		most .fromEvent ('click', revoke_administrator)
-			.map (function () {
-				return	{
-							edit_type: 'administrator-remove',
-							edit_content: 'remove'
-						};
-			}) .thru (util .user_edit (user))
-			//.tap (display_errors)
-			.observe (rehash);
-	});
-	self .on ('make_instructor', function (make_instructor) {
-		var user = make_instructor .getAttribute ('user');
-		
-		most .fromEvent ('click', make_instructor)
-			.map (function () {
-				return	{
-							edit_type: 'instructor-add',
-							edit_content: 'add'
-						};
-			}) .thru (util .user_edit (user))
-			//.tap (display_errors)
-			.observe (rehash);
-	});
-	self .on ('unmake_instructor', function (unmake_instructor) {
-		var user = unmake_instructor .getAttribute ('user');
-		
-		most .fromEvent ('click', unmake_instructor)
-			.map (function () {
-				return	{
-							edit_type: 'instructor-remove',
-							edit_content: 'remove'
-						};
-			}) .thru (util .user_edit (user))
-			//.tap (display_errors)
-			.observe (rehash);
-	});
-})(this);
-</script>
 
 <style>
 	:scope .localbutton1 {
@@ -113,3 +37,85 @@
     	left: 30%;
     }
 </style>
+
+<script>
+	(function (self) {
+	
+		//App to View
+		self .records ({
+			all_users: undefined
+		}) .on ('all_users', function () {
+			self .update ();
+		})
+		self .consume (
+			most .periodic (500)
+				.until (lifecycle (self))
+				.thru (content .users)
+				.skipRepeatsWith (json_equal)
+				.tap (display_errors),
+			function (users) {
+				self .emit ('all_users', users)
+			})
+		);
+	
+		//View to App
+		self .processes ({
+			make_administrator: ref,
+			revoke_administrator: ref,
+			make_instructor: ref,
+			unmake_instructor: ref
+		}) .on ('make_administrator', function (ref) {
+			var user = ref .getAttribute ('user');
+			
+			ref .consume (	
+				most .fromEvent ('click', ref)
+					.map (function () {
+						return	{
+									edit_type: 'administrator-add',
+									edit_content: 'add'
+								};
+					}) .thru (util .user_edit (user)),
+				display_errors
+			);
+		}) .on ('revoke_administrator', function (ref) {
+			var user = ref .getAttribute ('user');
+			
+			ref .consume (	
+				most .fromEvent ('click', ref)
+					.map (function () {
+						return	{
+									edit_type: 'administrator-remove',
+									edit_content: 'remove'
+								};
+					}) .thru (util .user_edit (user)),
+				display_errors
+			);
+		}) .on ('make_instructor', function (ref) {
+			var user = ref .getAttribute ('user');
+			
+			ref .consume (	
+				most .fromEvent ('click', ref)
+					.map (function () {
+						return	{
+									edit_type: 'instructor-add',
+									edit_content: 'add'
+								};
+					}) .thru (util .user_edit (user)),
+				display_errors
+			);
+		}) .on ('unmake_instructor', function (ref) {
+			var user = ref .getAttribute ('user');
+			
+			ref .consume (	
+				most .fromEvent ('click', ref)
+					.map (function () {
+						return	{
+									edit_type: 'instructor-remove',
+									edit_content: 'remove'
+								};
+					}) .thru (util .user_edit (user)),
+				display_errors
+			);
+		});
+	}) (this);
+</script>

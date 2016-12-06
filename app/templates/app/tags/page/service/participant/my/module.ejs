@@ -46,6 +46,7 @@
 		most .periodic (500)
 			.until (lifecycle (self))
 			.thru (content .course (course_id))
+			.skipRepeatsWith (json_equal)
 			.tap (display_errors)
 			.observe (function (course) {
 				self .emit ('course', course);

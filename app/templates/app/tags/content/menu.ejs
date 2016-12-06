@@ -2,10 +2,10 @@
     <p class="menu-label"> General </p>
     <ul class="menu-list">
         <li><a href="#service/participant">Participant</a></li>
-        <li><a href="#service/instructor">Instructor</a></li>
+        <li><a href="#service/instructor" if={ value ('.as_instructor') (get_cache (backend_path + '/login')) } >Instructor</a></li>
     </ul>
-    <p class="menu-label"> Administration </p>
-    <ul class="menu-list">
+    <p class="menu-label"if={ value ('.as_administrator') (get_cache (backend_path + '/login')) } > Administration </p>
+    <ul class="menu-list"if={ value ('.as_administrator') (get_cache (backend_path + '/login')) } >
         <li> <a href="#service/administrator">Manage Your Team</a>
         </li>
     </ul>

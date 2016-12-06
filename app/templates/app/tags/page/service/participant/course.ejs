@@ -4,10 +4,11 @@
     <h2 class="subtitle1" if={ (piece (((get_cache (backend_path + '/my/courses') || {}) .as_participant || {}) .enrolled_courses) || {}) [recalls ('course_id') || ''] }><mark>{ ((recalls ('course') || {}) .course || {}) .name }</mark></h2>
         <h2 class="subtitle1" if={ ! (piece (((get_cache (backend_path + '/my/courses') || {}) .as_participant || {}) .enrolled_courses) || {}) [recalls ('course_id') || ''] && (piece (((get_cache (backend_path + '/my/courses') || {}) .as_participant || {}) .completed_courses) || {}) [recalls ('course_id') || ''] }><strike>{ ((recalls ('course') || {}) .course || {}) .name }</strike></h2>
         <h2 class="subtitle1" if={ ! (piece (((get_cache (backend_path + '/my/courses') || {}) .as_participant || {}) .enrolled_courses) || {}) [recalls ('course_id') || ''] && ! (piece (((get_cache (backend_path + '/my/courses') || {}) .as_participant || {}) .completed_courses) || {}) [recalls ('course_id') || ''] }>{ ((recalls ('course') || {}) .course || {}) .name }</h2>
+        <h2 class="subtitle1">Category: { ((recalls ('course') || {}) .course || {}) .category }</h2>
         <p>{ ((recalls ('course') || {}) .course || {}) .description }</p>
         
-        <button class="localbutton button is-outlined is-info" disabled if={ (piece (((get_cache (backend_path + '/my/courses') || {}) .as_participant || {}) .enrolled_courses) || {}) [recalls ('course_id') || ''] }>
-            You are already enrolled in this course
+        <button class="localbutton button is-outlined is-info" type="submit" name="drop_course" if={ (piece (((get_cache (backend_path + '/my/courses') || {}) .as_participant || {}) .enrolled_courses) || {}) [recalls ('course_id') || ''] }>
+            Drop course
         </button>
         <button class="localbutton button is-outlined is-info" disabled if={ (get_cache (backend_path + '/login') || {}) .enroll_restricted && Object .keys (piece (((get_cache (backend_path + '/my/courses') || {}) .as_participant || {}) .enrolled_courses) || {}) .length }>
             You are restricted to take one course at a time
@@ -23,6 +24,7 @@
 (function (self) {
     self .on ('mount', function () {
         var enroll_course = self .root .querySelector ('button[name="enroll_course"]');
+        var drop_course = self .root .querySelector ('button[name="drop_course"]');
         
         enroll_course && enroll_course .addEventListener ('click', function () {
             self .one ('enroll', function () {
@@ -30,15 +32,28 @@
             });
             self .emit ('enroll');
         }, false);
+        drop_course && drop_course .addEventListener ('click', function () {
+            self .one ('drop', function () {
+                window .location .hash = '#service/participant'
+            });
+            self .emit ('drop');
+        }, false);
     });
     self .on ('updated', function () {
         var enroll_course = self .root .querySelector ('button[name="enroll_course"]');
+        var drop_course = self .root .querySelector ('button[name="drop_course"]');
         
         enroll_course && enroll_course .addEventListener ('click', function () {
             self .one ('enroll', function () {
                 window .location .hash = '#service/participant'
             });
             self .emit ('enroll');
+        }, false);
+        drop_course && drop_course .addEventListener ('click', function () {
+            self .one ('drop', function () {
+                window .location .hash = '#service/participant'
+            });
+            self .emit ('drop');
         }, false);
     });
     
@@ -55,7 +70,8 @@
         
         connects ({
             course: content .course (course_id),
-            enroll: util .course_enroll (course_id)
+            enroll: util .course_enroll (course_id),
+            drop: util .course_drop (course_id)
         }) (self);
 	    
         remembers ({

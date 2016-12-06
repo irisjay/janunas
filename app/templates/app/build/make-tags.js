@@ -52,13 +52,6 @@ var tags_info =	tag_files .map (function (filepath) {
 													/*debugger*/
 													console: console,
 													
-													/*
-													macros
-													*/
-													ref:	function (ref) {
-																return	" faux_ref={ self_ref_expression (self, '" + ref + "') } ";
-															},
-													
 													
 													/*
 													renderers

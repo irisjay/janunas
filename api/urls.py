@@ -8,6 +8,7 @@ urlpatterns = [
 	url (r'^courses$', views.courses, name = 'courses'),
 	url (r'^course/([^/]+)$', views.course, name = 'course'),
 	url (r'^course/([^/]+)/enroll$', views.course_enroll, name = 'course_enroll'),
+	url (r'^course/([^/]+)/drop', views.course_drop, name = 'course_drop'),
 	url (r'^my/courses$', views.my_courses, name = 'my_courses'),
 	url (r'^my/course/new$', views.my_course_new, name = 'my_course_new'),
 	url (r'^my/course/delete$', views.my_course_delete, name = 'my_course_delete'),

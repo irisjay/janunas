@@ -28,7 +28,7 @@ class Component(models.Model):
 	module = models.ForeignKey(Module)
 
 class Participant(models.Model):
-	enroll_restricted = models.BooleanField(default=False)
+	enroll_restricted = models.BooleanField(default=True)
 	completed_courses = models.ManyToManyField(Course, related_name='completed_participants', blank=True)
 	completed_modules = models.ManyToManyField(Module, related_name='completed_participants', blank=True)
 	completed_components = models.ManyToManyField(Component, related_name='completed_participants', blank=True)

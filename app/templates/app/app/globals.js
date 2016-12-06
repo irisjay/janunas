@@ -29,6 +29,12 @@ global fetch
 							};
 				};
 								
+				
+var relate =	function (upstream, downstream) {
+					return	upstream
+								.filter (function () { return false; })
+								.merge (downstream);
+				};
 								
 										
 	var without =	function (you) {
@@ -114,16 +120,15 @@ var filename =	function (url) {
 					return url .split ('/') .reverse () [0];
 				};
 
-var each_ref =	function (ref) {
-					return	function (ref_changes) {
-								return	ref_changes .filter (function (change) {
-											return change .add;
-										})
-										.map (function (change) {
-											return change .add;
-										});
-							};
-				};			
+var ref =	function (ref_changes) {
+				return	ref_changes .filter (function (change) {
+							//log (change);
+							return change .add;
+						})
+						.map (function (change) {
+							return change .add;
+						});
+			};
 var all_refs =	function (ref) {
 					var refs = [];
 					return	function (ref_changes) {
@@ -142,42 +147,13 @@ var all_refs =	function (ref) {
 				};								
 								
 
-								
+								var json_equal =	function (a, b) {
+														return JSON .stringify (a) === JSON .stringify (b)
+													};
 	
 	var rehash = function () { window.location.reload(); };
 	
 	
-										var refs = {};
-										var self_ref_expression =	function (self, ref) {
-																		refs [ref] = (+ (refs [ref]) || 0) + 1;
-																		var ref_id = ref + '__' + refs [ref];
-																		
-																		var dom;
-																		var get_dom =	function () {
-																							if (! dom) {
-																								dom = self .root .querySelector ('[faux_ref="' + ref_id + '"]');
-																								if (dom) {
-																									dom .removeAttribute ('faux_ref');
-																								}
-																							}
-																						};
-																//log (self);
-																		self .on ('mount', function () {
-																			get_dom ();
-																			self .emit (ref, { add: dom });
-																		});
-																		self .on ('before-unmount', function () {
-																			get_dom ();
-																			self .emit (ref, { remove: dom });
-																		});
-																		self .on ('updated', function () {
-																			get_dom ();
-																			self .emit (ref, { add: dom });
-																			//self .emit (ref, { change: dom });
-																		});
-																		
-																		return ref_id;
-																	};
 
 			
 			
@@ -293,8 +269,14 @@ var value =	function (/*property_name*/) {
 													};
 			
 			
-var lifecycle =	function (tag) {
-					return most .fromEvent ('unmount', tag);
+						
+var consume =	function (self, consumer) {
+					return	function (stream) {
+								return stream .until (lifecycle (self)) .observe (consumer);
+							};
+				};
+var lifecycle =	function (unmountable) {
+					return most .fromEvent ('unmount', unmountable);
 				};
 			
 					

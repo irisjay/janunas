@@ -51,9 +51,9 @@ var fetch_path =	function (path) {
 														    return response .json ();
 														})
 														.then (function (response) {
-															log ('queryied network', path, request, response);
+															//log ('queryied network', path, request, response);
 															return response;
-														});
+														}) .catch(function (e){debugger;});
 										}
 									};
 						var cache =	function (path, value) {
@@ -153,8 +153,9 @@ var reader =	function (path, request, response) {
 					var read = read_path (path) (request .read || {}, response);
 					
 					var reader =	function (interest) {
-										interest .observe (read);
-										return most .fromEvent (path, fetcher);
+										return	relate (
+													interest .map (read),
+													most .fromEvent (path, fetcher));
 									};
 					reader .filter =	{
 											__outgoing_memory_filter: read
@@ -170,8 +171,9 @@ var editer =	function (path, request, response, predicter) {
 					var edit = edit_path (path) (request .edit || {}, response, predicter || function (data) { return undefined; });
 					
 					var editer =	function (interest) {
-										interest .observe (edit);
-										return most .fromEvent (path, fetcher);
+										return	relate (
+													interest .map (edit),
+													most .fromEvent (path, fetcher))
 									}
 					editer .filter =	{
 											__outgoing_memory_filter: read
@@ -185,8 +187,9 @@ var writer =	function (path, request, response) {
 					var write = write_path (path) (request .write || {}, response);
 					
 					var writer =	function (interest) {
-										interest .observe (write);
-										return most .fromEvent (path, fetcher);
+										return	relate (
+													interest .map (write),
+													most .fromEvent (path, fetcher))
 									};
 					writer .filter =	{
 											__incoming_memory_filter: function () {}
@@ -245,6 +248,14 @@ util .course_enroll =	function (course_id) {
 												}
 									}, '{ response }')
 						};
+util .course_drop =	function (course_id) {
+						return	writer (backend_path + '/course/' + course_id + '/drop', {
+									write:	{
+												method: 'GET',
+												headers: '{ logged_in_header () }'
+											}
+								}, '{ response }')
+					};
 util .component_done =	function (course_id, module_order, component_order) {
 							return	writer (backend_path + '/my/course/' + course_id + '/module/' + module_order + '/component/' + component_order + '/done', {
 										write:	{

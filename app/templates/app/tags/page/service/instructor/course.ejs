@@ -8,8 +8,8 @@
 		</tr>
 		<tr each={ assemble (my ('course', '.course .module_set')) }
 			><td><a href="#service/instructor/module/#{ my ('course_id') }/{ order }">{ name }</a></td
-			><td><button class="localbutton button is-outlined is-info" order={ order } <%- ref ('delete_module') %>>x</button></td
-			><td><button class="localbutton button is-outlined is-info" order={ order } onclick={ emit.bind(self,'gasd',+order) } >shift</button></td
+			><td><button class="localbutton button is-outlined is-info" order={ order } ref="delete_module" >x</button></td
+			><td><button class="localbutton button is-outlined is-info" order={ order } ref="shift_module" >shift</button></td
 		></tr>
 	</table>
 	
@@ -32,6 +32,7 @@
 			most .periodic (500)
 				.until (lifecycle (self))
 				.thru (content .course (course_id))
+				.skipRepeatsWith (json_equal)
 				.observe (function (course) {
 					self .emit ('course', course);
 				});
@@ -75,12 +76,14 @@
 				});
 			});
 		});
-		self .remembers ('gasd');
-		self .on ('gasd', function (order) {
-					self .emit ('reorder', {
-						module_1_order: +order,
-						module_2_order: (+order + 1) % assemble (self .my ('course', '.course .module_set')) .length
-					});
+		self .on ('shift_module', function (shift_module) {
+			var order = shift_module .getAttribute ('order');
+			shift_module .addEventListener ('click', function () {
+				self .emit ('reorder', {
+					module_1_order: +order,
+					module_2_order: (+order + 1) % assemble (self .my ('course', '.course .module_set')) .length
+				});
+			});
 		});
 		self .on ('publish_course', function (publish_course) {
 			publish_course .addEventListener ('click', function () {

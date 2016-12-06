@@ -4,7 +4,7 @@
             <label style="margin:20px">Module name: </label><br/>
             <input type="text" style="width:400px; margin:20px" <%- ref ('__module_name') %>>
             <br/>
-        <button class="localbutton button is-outlined is-info" type="submit" <%- ref ('add_module') %>>
+        <button class="localbutton button is-outlined is-info" type="submit" <%- ref ('__add_module') %>>
             Add module
         </button>
     
@@ -29,12 +29,13 @@
 		});
 		
 		
+        self .remembers ('add_interest');
 		connects ({
-			add_module: each_ref ('add_module')
+			__add_module: each_ref ('__add_module')
 		}) (self);
-		self .on ('add_module', function (add_module) {
-		    add_module .addEventListener ('input', function () {
-		        self .emit ('add_module', module_name .value);
+		self .on ('__add_module', function (__add_module) {
+		    __add_module .addEventListener ('click', function () {
+		        self .emit ('add_interest');
 		    });
 		});
         
@@ -43,7 +44,7 @@
 		self .on ('input', function (args) {
     		var course_id = args [0];
     		
-    		most .fromEvent ('click', self .my ('add_module'))
+    		most .fromEvent ('add_interest', self)
     			.map (function () {
     				return	{
                                 module_name: self .my ('module_name')

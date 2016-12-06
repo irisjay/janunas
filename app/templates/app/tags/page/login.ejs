@@ -10,10 +10,10 @@
 				
 				<section class="section"></section>
 				
-				<button class="button is-large is-info" type="submit" <%- ref ('login') %>>
+				<button class="button is-large is-info" type="submit" ref="login" >
 					Login
 				</button>
-				<button class="button is-large" type="submit" <%- ref ('register') %>>
+				<button class="button is-large" type="submit" ref="register" >
 					Register
 				</button>
 			</div>
@@ -26,50 +26,50 @@
 		if (get_cache (backend_path + '/login') && ! get_cache (backend_path + '/login') .error) {
 			window .location .hash = '#service'
 		}
-		
 		check_out (backend_path + '/cats', { method: 'GET' }, ' { response } ');
 		
-		remembers ({
+		//View
+		self .records ({
 			username: undefined,
 			password: undefined
-		}) (self);
+		});
 		
-		
-		connects ({
-			login: each_ref ('login'),
-			register: each_ref ('register')
-		}) (self);
-		self .on ('login',  function (login) {
-			most .fromEvent ('click', login)
-				.map (function () {
-					return	{
-								username: self .my ('username'),
-								password: self .my ('password')
-							}
-				})
-				.thru (util .login)
-				.tap (display_errors)
-				.observe (function (response) {
+		//View to Api
+		self .processes ({
+			login: ref,
+			register: ref
+		}) .on ('login',  function (ref) {
+			ref .consume (function (response) {
 					if (response && ! response .error) {
 						window .location .hash = '#service'
 					}
-				});
-		});
-		self .on ('register',  function (register) {
-			most .fromEvent ('click', register)
-				.map (function () {
-					return	{
-								username: self .my ('username'),
-								password: self .my ('password')
-							}
-				})
-				.thru (util .register)
-				.tap (display_errors)
-				.observe (function (response) {
+				},
+				most .fromEvent ('click', ref)
+					.map (function () {
+						return	{
+									username: self .my ('username'),
+									password: self .my ('password')
+								}
+					})
+					.thru (util .ref)
+					.tap (display_errors)
+			);
+		}) .on ('register',  function (register) {
+			ref .consume (function (response) {
 					if (response && ! response .error) {
 						alert ('Successfully registered!');
 					}
-				});
+				},
+				most .fromEvent ('click', ref)
+					.map (function () {
+						return	{
+									username: self .my ('username'),
+									password: self .my ('password')
+								}
+					})
+					.thru (util .ref)
+					.tap (display_errors)
+			);
 		});
 	})(this);
 </script>

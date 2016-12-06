@@ -80,10 +80,14 @@
 			self .emit ('module_order', module_order);
 			self .emit ('component_order', component_order);
 	
-			most .just ()
+			most .periodic (500)
+				.until (lifecycle (self))
 				.thru (content .course (course_id) )
+				.skipRepeatsWith (json_equal)
+				.tap (display_errors)
 				.observe (function (course) {
 					self .emit ('course', course);
+					setTimeout (function(){self .update ()}, 1000);
 				});
 				
 					self .emit ('course', content .course (course_id).filter.__outgoing_memory_filter());
@@ -131,10 +135,7 @@ var youtube_parser =function (url){
 							};
 				})
 				.thru (util .component_edit (course_id, module_order, component_order))
-				.tap (display_errors)
-				.observe (function (x) {
-					setTimeout (rehash, 1500);
-				});
+				.observe (display_errors);
 			
 				
 			self .remembers ('file');
@@ -176,10 +177,7 @@ var youtube_parser =function (url){
 							};
 				})
 				.thru (util .component_edit (course_id, module_order, component_order))
-				.tap (display_errors)
-				.observe (function (x) {
-					rehash ();
-				});
+				.observe (display_errors);
 		});
 	})(this);
 </script>
